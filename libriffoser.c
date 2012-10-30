@@ -106,7 +106,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 							track->wavestates[i2]->samplenum-=RIFFOSER_RENDER___WSC(track->waves[i2]);
 						0&&printf("%lu: rendering wave %lu (%f-%f), samplenum is %f (%f%%)\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]),RIFFOSER_RENDER___TO(track->wavestates[i2]),track->wavestates[i2]->samplenum,RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
-						fret=fret*track->waves[i2]->amplitude/100;
+						fret=fret*track->waves[i2]->amplitude/200;
 						// replace for now
 						val=fret;
 					}
