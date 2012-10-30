@@ -31,13 +31,13 @@ void riffoser_track_free(struct riffoser_track * track) {
 }
 #define RIFFOSER_RENDER___INITWAVES \
 	for (i2=0;i2<track->waves_count;i2++) {\
-		if (track->wavestates[i2]->from==i5) {\
+		if (RIFFOSER_RENDER___FROM(track->wavestates[i2])==i5) {\
 			track->wavestates[i2]->state=RIFFOSER_WAVESTATE_RENDERING;\
-			0&&printf("%lu: wave %lu started\n",i1,i2);\
+			1&&printf("%lu: wave %lu started\n",i1,i2);\
 		}\
 	}
-#define RIFFOSER_RENDER___FROM(_v) (track->channels*samplerate*bytespersample*_v->from)
-#define RIFFOSER_RENDER___TO(_v) (track->channels*samplerate*bytespersample*_v->to)
+#define RIFFOSER_RENDER___FROM(_v) (track->channels*samplerate*_v->from)
+#define RIFFOSER_RENDER___TO(_v) (track->channels*samplerate*_v->to)
 // wave samples count (wave)
 #define RIFFOSER_RENDER___WSC(_w) ((1*samplerate/_w->frequency))
 // wave pos percent
@@ -46,8 +46,10 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 	FILE * fp;
 	unsigned long i1,i2,i3,i4,i5,i6,fpi;
 	unsigned char c1,bytespersample;
+	unsigned char * skipbuf;
 	float fret,val;
-	unsigned int ival;
+	long ival;
+	unsigned char nomorewaves;
 	riffoser_channel_t chan;
 	bytespersample=bitspersample/8;
 	fp=fopen(filename,"wb");
@@ -71,23 +73,25 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 	i1=0;
 	i3=track->waves_count;
 	i6=0;
+	nomorewaves=0;
 	while (1) {
 		chan=i1%track->channels;
-		if (i3==track->waves_count) {
+		if (i3==track->waves_count&&!nomorewaves) {
 			i5=i1;
-			0&&printf("%lu: finding nearest wave...\n",i1);
+			1&&printf("%lu: finding nearest wave...\n",i1);
 			for (i2=0;i2<track->waves_count;i2++){
 				if ((track->wavestates[i2]->state==RIFFOSER_WAVESTATE_IDLE)&&(((i3==track->waves_count))||(RIFFOSER_RENDER___FROM(track->wavestates[i2])<=i5))&&(RIFFOSER_RENDER___FROM(track->wavestates[i2])>=i6)) {
-					0&&printf("%lu: found wave %lu with from %f\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]));
+					1&&printf("%lu: found wave %lu with from %f\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]));
 					i3=i2;
 					i5=RIFFOSER_RENDER___FROM(track->wavestates[i2]);
 				}
 				else {
-					0&&printf("%lu: skipping wave %lu\n",i1,i2);
+					1&&printf("%lu: skipping wave %lu\n",i1,i2);
 				}
 			}
 			if (i3!=track->waves_count)
 				0&&printf("next wave will be %lu at %f\n",i3,RIFFOSER_RENDER___FROM(track->wavestates[i3]));
+			else nomorewaves=1;
 		}
 		c1=0;
 		val=0;
@@ -95,7 +99,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 			if (track->wavestates[i2]->state==RIFFOSER_WAVESTATE_RENDERING) {
 				if (RIFFOSER_RENDER___TO(track->wavestates[i2])<i1) {
 					track->wavestates[i2]->state=RIFFOSER_WAVESTATE_FINISHED;
-					0&&printf("%lu: wave %lu finished\n",i1,i2);
+					1&&printf("%lu: wave %lu finished\n",i1,i2);
 				} else {
 					if (track->wavestates[i2]->channel==chan) {
 //						printf("correct channel\n");
@@ -117,9 +121,9 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 		}
 		// convert val to needed format and save
 		if (bytespersample==1) {
-			ival=round(val*2.56);
-			if (ival>255)
-				ival=255;
+			ival=round(val*2.56)-128;
+			if (ival>127)
+				ival=127;
 		}
 		else if (bytespersample==2) {
 			ival=round(val*655.36);
@@ -134,7 +138,12 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 		riffoser_writeint(bytespersample,ival);
 		if (c1==0) {
 			if (i3!=track->waves_count) {
-				0&&printf("%lu: warping to position %lu\n",i1,i5);
+				1&&printf("%lu: warping to position %lu\n",i1,i5);
+				i4=(i5-i1)*bytespersample;
+				skipbuf=malloc(i4);
+				memset(skipbuf,0,i4);
+				riffoser_writebuf(i4,skipbuf);
+				free(skipbuf);
 				i1=i5;
 				RIFFOSER_RENDER___INITWAVES;
 				i3=track->waves_count;
@@ -151,7 +160,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 			}
 			i1++;
 		}
-//	usleep(100000);
+	//usleep(100000);
 	}
 	
 	//riffoser_writebuf(i1,_wavesound->data);
