@@ -37,7 +37,7 @@
       <compileType>
         <cTool>
           <incDir>
-            <pElem>/home/dmitry/work/riffoser</pElem>
+            <pElem>.</pElem>
           </incDir>
         </cTool>
         <linkerTool>

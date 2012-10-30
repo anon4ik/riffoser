@@ -64,7 +64,7 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libriffoser.so: ${OBJECTFILES}
 ${OBJECTDIR}/libriffoser.o: libriffoser.c 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.c) -g -I/home/dmitry/work/riffoser -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/libriffoser.o libriffoser.c
+	$(COMPILE.c) -g -I. -fPIC  -MMD -MP -MF $@.d -o ${OBJECTDIR}/libriffoser.o libriffoser.c
 
 # Subprojects
 .build-subprojects:
