@@ -3,7 +3,7 @@ riffoser
 by anon@anonymous.lv
 ========
 
-A C library for generating RIFF sounds, combining them into tracks and adding effects. other formats (MP3, S3M, ...) exporting is planned later
+A C library to be used for comfortable music coding (see examples). generating RIFF sounds, combining them into tracks, adding effects, etc. other formats (MP3, S3M, ...) exporting is planned later
 
 ===============================================
 
