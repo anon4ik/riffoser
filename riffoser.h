@@ -10,7 +10,10 @@
 extern "C" {
 #endif
 
-	
+#define riffoser_amplitude_t float
+#define riffoser_frequency_t float
+#define riffoser_pitch_t float
+#define riffoser_wavetype_t unsigned char
 #define riffoser_trackpos_t float
 #define riffoser_wavestate_state_t unsigned char
 #define RIFFOSER_WAVESTATE_IDLE 0
@@ -25,8 +28,24 @@ struct riffoser_wavestate {
 	float samplenum;
 };
 
-struct riffoser_filter {
-	
+struct riffoser_instrumentstate {
+	riffoser_wavestate_state_t state;
+	riffoser_trackpos_t from;
+	riffoser_trackpos_t to;
+	float samplenum;
+	riffoser_channel_t channel;
+	riffoser_amplitude_t amplitude;
+	riffoser_frequency_t frequency;
+	riffoser_pitch_t pitch;
+};
+
+struct riffoser_instrument {
+	struct riffoser_wave ** waves;
+	struct riffoser_wavestate ** wavestates;
+	unsigned short waves_count;
+	struct riffoser_instrument ** instruments;
+	struct riffoser_instrumentstate ** instrumentstates;
+	unsigned short instruments_count;
 };
 
 #define riffoser_samplerate_t unsigned int
@@ -37,16 +56,13 @@ struct riffoser_track {
 	struct riffoser_wave ** waves;
 	struct riffoser_wavestate ** wavestates;
 	unsigned long waves_count;
-	struct riffoser_filter ** filters;
-	unsigned long filters_count;
+	struct riffoser_instrument ** instruments;
+	struct riffoser_instrumentstate ** instrumentstates;
+	unsigned short instruments_count;
 	riffoser_tracklen_t length;
 };
 
 
-#define riffoser_amplitude_t float
-#define riffoser_frequency_t float
-#define riffoser_pitch_t float
-#define riffoser_wavetype_t unsigned char
 struct riffoser_wave {
 	riffoser_amplitude_t amplitude;
 	riffoser_frequency_t frequency;

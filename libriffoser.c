@@ -17,6 +17,12 @@ void riffoser_track_free(struct riffoser_track * track) {
 		free(track->wavestates);
 		free(track->waves);
 	}
+	if (track->instruments_count>0) {
+		for (i=0;i<track->instruments_count;i++)
+			free(track->instrumentstates[i]);
+		free(track->instrumentstates);
+		free(track->instruments);
+	}
 	free(track);
 }
 
