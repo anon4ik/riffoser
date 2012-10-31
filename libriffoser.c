@@ -143,7 +143,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 		if (c1==0) {
 			if (i3!=track->waves_count) {
 				0&&printf("%lu: warping to position %lu\n",i1,i5);
-				i4=(i5-i1)*bytespersample;
+				i4=(i5-i1+chan)*bytespersample;
 				skipbuf=malloc(i4);
 				memset(skipbuf,0,i4);
 				riffoser_writebuf(i4,skipbuf);
