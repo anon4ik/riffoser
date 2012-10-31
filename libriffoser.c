@@ -38,7 +38,7 @@ void riffoser_track_free(struct riffoser_track * track) {
 }
 #define RIFFOSER_RENDER___INITWAVES \
 	for (i2=0;i2<track->waves_count;i2++) {\
-		if (RIFFOSER_RENDER___FROM(track->wavestates[i2])==i5) {\
+		if (floor(RIFFOSER_RENDER___FROM(track->wavestates[i2]))==i5) {\
 			track->wavestates[i2]->state=RIFFOSER_WAVESTATE_RENDERING;\
 			0&&printf("%lu: wave %lu started\n",i1,i2);\
 		}\
@@ -117,7 +117,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 						fret=fret*track->waves[i2]->amplitude/200;
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
-						// can be improved
+						// can be improved somehow
 //						val=(val*vcount+fret)/(++vcount);
 						val+=fret;
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
@@ -145,8 +145,8 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 				ival=4294967295;
 		}
 		riffoser_writeint(bytespersample,ival);
-		if (c1==0) {
-			if (i3!=track->waves_count) {
+		if ((c1==0)) {
+			if ((i3!=track->waves_count)) {
 				0&&printf("%lu: warping to position %lu\n",i1,i5);
 				i4=(i5-i1+chan)*bytespersample;
 				skipbuf=malloc(i4);
@@ -169,6 +169,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 			}
 			i1++;
 		}
+//		printf("%u\n",i1);
 	//usleep(100000);
 	}
 	

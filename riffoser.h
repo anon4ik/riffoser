@@ -24,6 +24,10 @@ struct riffoser_wavestate {
 	float samplenum;
 };
 
+struct riffoser_filter {
+	
+};
+
 #define riffoser_samplerate_t unsigned int
 #define riffoser_bitspersample_t unsigned char
 #define riffoser_tracklen_t float
@@ -32,6 +36,8 @@ struct riffoser_track {
 	struct riffoser_wave ** waves;
 	struct riffoser_wavestate ** wavestates;
 	unsigned long waves_count;
+	struct riffoser_filter ** filters;
+	unsigned long filters_count;
 	riffoser_tracklen_t length;
 };
 
@@ -54,7 +60,14 @@ struct riffoser_wave {
 #define RIFFOSER_WAVE_COSINUSOID 4
 
 #define RIFFOSER_WAVE_TEST1 11
+#define RIFFOSER_WAVE_TEST2 12
 
+double DIVTIMES(double base,double by,unsigned char amount) {
+	unsigned char i;
+	for (i=0;i<amount;i++)
+		base/=by;
+	return base;
+}
 #define RIFFOSER_WAVE_FUNC(_wave,x) {\
 	if (_wave->type==RIFFOSER_WAVE_SQUARE)\
 		fret=x<_wave->pitch?0:100;\
@@ -65,10 +78,10 @@ struct riffoser_wave {
 	else if (_wave->type==RIFFOSER_WAVE_COSINUSOID)\
 		fret=x<_wave->pitch?cos(x)*100:cos(100-(x-_wave->pitch)*2);\
 	else if (_wave->type==RIFFOSER_WAVE_TEST1)\
-		fret=x<_wave->pitch?tan(x)*100:tan(100-(x-_wave->pitch)*2)*100;\
+		fret=30*(cos(M_PI*(x+1))-sin(2*M_PI*x/100))/*x<_wave->pitch?tan(x)*100:tan(100-(x-_wave->pitch)*2)*100*/;\
+	else if (_wave->type==RIFFOSER_WAVE_TEST2)\
+		fret=DIVTIMES(100,2,10*(-cos(M_PI*x)+sin(2*M_PI*x)));\
 }
-
-
 
 
 extern struct riffoser_track * riffoser_track_init(riffoser_channel_t channels);
