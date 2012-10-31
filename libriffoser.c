@@ -1,5 +1,6 @@
 #include <riffoser.h>
 
+
 struct riffoser_track * riffoser_track_init(riffoser_channel_t channels) {
 	struct riffoser_track * track;
 	track=malloc(sizeof(struct riffoser_track));

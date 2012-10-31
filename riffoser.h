@@ -10,6 +10,7 @@
 extern "C" {
 #endif
 
+	
 #define riffoser_trackpos_t float
 #define riffoser_wavestate_state_t unsigned char
 #define RIFFOSER_WAVESTATE_IDLE 0
