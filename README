@@ -34,9 +34,9 @@ frees track object
 struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_amplitude_t amplitude,riffoser_frequency_t frequency,riffoser_pitch_t pitch)
 initializes and returns wave object. parameters are:
 wavetype can be one of RIFFOSER_WAVE_SQUARE RIFFOSER_WAVE_TRIANGLE RIFFOSER_WAVE_SINE RIFFOSER_WAVE_COSINUSOID
-amplitude is generally the volume of wave, in percents (0-100)
+amplitude is generally the volume of wave, in percents (0-99)
 frequency is frequency of the wave, in Hz
-pitch is position of wave's top point, in percents (0-100). 50 is common choise
+pitch is position of wave's top point, in percents (0-99). 50 is common choise
 
 --------
 
