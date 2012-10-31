@@ -19,6 +19,13 @@ void riffoser_track_free(struct riffoser_track * track) {
 	free(track);
 }
 
+#define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
+	if (v<min)\
+		v=min;\
+	else if (v>max)\
+		v=max;\
+}
+
 #define riffoser_writestr(value) {\
 	fprintf(fp,value);\
 }
@@ -170,6 +177,7 @@ struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t type,riffoser_ampl
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
 	wave->type=type;
+	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
 	wave->amplitude=amplitude;
 	wave->frequency=frequency;
 	wave->pitch=pitch;
