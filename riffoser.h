@@ -45,6 +45,8 @@ struct riffoser_wave {
 	riffoser_frequency_t frequency;
 	riffoser_pitch_t pitch;
 	riffoser_wavetype_t type;
+	void ** args;
+	unsigned char args_count;
 };
 #define RIFFOSER_WAVE_SQUARE 1
 #define RIFFOSER_WAVE_TRIANGLE 2
