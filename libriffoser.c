@@ -47,7 +47,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 	unsigned char * skipbuf;
 	float fret,val;
 	long ival;
-	unsigned char nomorewaves;
+	unsigned char nomorewaves,vcount;
 	riffoser_channel_t chan;
 	bytespersample=bitspersample/8;
 	fp=fopen(filename,"wb");
@@ -93,6 +93,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 		}
 		c1=0;
 		val=0;
+		vcount=0;
 		for (i2=0;i2<track->waves_count;i2++){
 			if (track->wavestates[i2]->state==RIFFOSER_WAVESTATE_RENDERING) {
 				if (RIFFOSER_RENDER___TO(track->wavestates[i2])<i1) {
@@ -108,7 +109,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						fret=fret*track->waves[i2]->amplitude/200;
 						// replace for now
-						val=fret;
+						val=(val*vcount+fret)/(++vcount);
 					}
 					else {
 //						printf("wrong channel ( %u / %u )\n",track->wavestates[i2]->channel,chan);
