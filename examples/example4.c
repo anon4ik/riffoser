@@ -1,8 +1,8 @@
 /*
 
-	a stress-test of some kind for waves mixing / addition
-	this generates 1-minute-length stereo track with random waves
-	parameters are easily tweakable via defines
+        a stress-test of some kind for waves mixing / addition
+        this generates 1-minute-length stereo track with random waves
+        parameters are easily tweakable via defines
 
 */
 
@@ -10,7 +10,7 @@
 
 #include <riffoser.h>
 
-#define WAVES_COUNT 20 // number of different waves
+#define WAVES_COUNT 200 // number of different waves
 #define ADDITIONS_COUNT 600 // number of sounds in track
 #define ADDITION_LENGTH (rand()%100)/10
 #define TRACK_LENGTH 60 // track length, seconds
@@ -37,9 +37,9 @@ int main(){
 	waves=malloc(sizeof(struct riffoser_wave *)*WAVES_COUNT);
 
 	for (i=0;i<WAVES_COUNT;i++) {
-		c1=rand()%3;
-		c2=(c1==0?RIFFOSER_WAVE_SINE:(c1==1?RIFFOSER_WAVE_TRIANGLE:RIFFOSER_WAVE_SQUARE));
-		waves[i]=riffoser_wave_init(RIFFOSER_WAVE_SINE,rand()%(MAXVOLUME-MINVOLUME+1)+MINVOLUME,rand()%(MAXFREQUENCY-MINFREQUENCY+1)+MINFREQUENCY,rand()%(MAXPITCH-MINPITCH+1)+MINPITCH);
+		c1=rand()%4;
+		c2=(c1==0?RIFFOSER_WAVE_SINE:(c1==1?RIFFOSER_WAVE_TRIANGLE:(c1==2?RIFFOSER_WAVE_SQUARE:RIFFOSER_WAVE_COSINUSOID)));
+		waves[i]=riffoser_wave_init(c2,rand()%(MAXVOLUME-MINVOLUME+1)+MINVOLUME,rand()%(MAXFREQUENCY-MINFREQUENCY+1)+MINFREQUENCY,rand()%(MAXPITCH-MINPITCH+1)+MINPITCH);
 	}
 
 	for (i=0;i<ADDITIONS_COUNT;i++) {
