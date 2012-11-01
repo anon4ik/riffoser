@@ -59,7 +59,7 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 	unsigned long i1,i2,i3,i4,i5,i6,fpi;
 	unsigned char c1,bytespersample;
 	unsigned char * skipbuf;
-	float fret,val;
+	float fret,val,phi1,phi2;
 	long ival;
 	unsigned char nomorewaves,vcount;
 	riffoser_channel_t chan;
@@ -125,7 +125,9 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
 						// can be improved somehow
-						val=(val*vcount+fret)/(++vcount);
+//						phi1 = ((360° * dt) / track->wavestates[i2]->samplenum);
+						val=sqrt(val + pow(fret,2) + 2 * val * fret)/(val!=0?2:1);
+//						val=(val*vcount+fret)/(++vcount);
 //						val+=fret;
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
 					}
