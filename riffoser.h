@@ -100,7 +100,7 @@ double DIVTIMES(double base,double by,unsigned char amount) {
 	else if (_wave->type==RIFFOSER_WAVE_TEST2)\
 		fret=DIVTIMES(100,2,10*(-cos(M_PI*x)+sin(2*M_PI*x)));\
 	else if (_wave->type==_RIFFOSER_WAVE_DATA)\
-		fret=_wave->data[(unsigned long)round(x*2)];\
+		fret=_wave->data[(unsigned long)floor(x*_wave->data_count/1000)];1&&printf("%f\n",x*_wave->data_count/1000);\
 }
 
 

@@ -223,7 +223,6 @@ struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percen
 	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
 	wave->type=_RIFFOSER_WAVE_DATA;
 	wave->amplitude=amplitude;
-	wave->frequency=length;
 	wave->pitch=pitch;
 	
 	fp=fopen(filename,"rb");
@@ -268,6 +267,7 @@ struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percen
 					if (!strcmp(tmps,"data")) { // head was read correctly
 						riffoser_readint(wave->data_count,4);
 						wave->data=malloc(tmpi);
+						wave->frequency=1/(float)(wave->data_count/wave->channels/samplerate/bytespersample);
 						
 						riffoser_readbuf(wave->data,wave->data_count);						
 						
