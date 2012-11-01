@@ -26,7 +26,7 @@ int main(){
                 riffoser_track_addwave(track,wave1,1,i+0.25,i+0.75);
         }
 
-        riffoser_track_writeriff(track,"example2.wav",44100,16);
+        riffoser_track_writewav(track,"example2.wav",44100,16);
 
         riffoser_wave_free(wave1);
         riffoser_wave_free(wave2);

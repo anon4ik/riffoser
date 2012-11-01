@@ -10,9 +10,8 @@
 extern "C" {
 #endif
 
-#define riffoser_amplitude_t float
+#define riffoser_percent_t float
 #define riffoser_frequency_t float
-#define riffoser_pitch_t float
 #define riffoser_wavetype_t unsigned char
 #define riffoser_trackpos_t float
 #define riffoser_wavestate_state_t unsigned char
@@ -34,9 +33,9 @@ struct riffoser_instrumentstate {
 	riffoser_trackpos_t to;
 	float samplenum;
 	riffoser_channel_t channel;
-	riffoser_amplitude_t amplitude;
+	riffoser_percent_t amplitude;
 	riffoser_frequency_t frequency;
-	riffoser_pitch_t pitch;
+	riffoser_percent_t pitch;
 };
 
 struct riffoser_instrument {
@@ -62,19 +61,21 @@ struct riffoser_track {
 	riffoser_tracklen_t length;
 };
 
-
 struct riffoser_wave {
-	riffoser_amplitude_t amplitude;
+	riffoser_percent_t amplitude;
 	riffoser_frequency_t frequency;
-	riffoser_pitch_t pitch;
+	riffoser_percent_t pitch;
 	riffoser_wavetype_t type;
-	void ** args;
-	unsigned char args_count;
+	riffoser_channel_t channels;
+	unsigned char * data;
+	unsigned long data_count;
 };
+
 #define RIFFOSER_WAVE_SQUARE 1
 #define RIFFOSER_WAVE_TRIANGLE 2
 #define RIFFOSER_WAVE_SINE 3
 #define RIFFOSER_WAVE_COSINUSOID 4
+#define _RIFFOSER_WAVE_DATA 5
 
 #define RIFFOSER_WAVE_TEST1 11
 #define RIFFOSER_WAVE_TEST2 12
@@ -98,15 +99,18 @@ double DIVTIMES(double base,double by,unsigned char amount) {
 		fret=30*(cos(M_PI*(x+1))-sin(2*M_PI*x/100))/*x<_wave->pitch?tan(x)*100:tan(100-(x-_wave->pitch)*2)*100*/;\
 	else if (_wave->type==RIFFOSER_WAVE_TEST2)\
 		fret=DIVTIMES(100,2,10*(-cos(M_PI*x)+sin(2*M_PI*x)));\
+	else if (_wave->type==_RIFFOSER_WAVE_DATA)\
+		fret=_wave->data[(unsigned long)round(x*2)];\
 }
 
 
 extern struct riffoser_track * riffoser_track_init(riffoser_channel_t channels);
 extern void riffoser_track_free(struct riffoser_track * track);
-extern void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample);
+extern void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample);
 extern void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave * wave,riffoser_channel_t channel,riffoser_trackpos_t from,riffoser_trackpos_t to);
 
-extern struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_amplitude_t amplitude,riffoser_frequency_t frequency,riffoser_pitch_t pitch);
+extern struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_percent_t amplitude,riffoser_frequency_t frequency,riffoser_percent_t pitch);
+extern struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percent_t amplitude,riffoser_frequency_t frequency,riffoser_percent_t pitch);
 extern void riffoser_wave_free(struct riffoser_wave * wave);
 
 extern struct riffoser_instrument * riffoser_instrument_init();

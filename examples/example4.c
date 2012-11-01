@@ -49,7 +49,7 @@ int main(){
 	}
 
 
-	riffoser_track_writeriff(track,"example4.wav",44100,16);
+	riffoser_track_writewav(track,"example4.wav",44100,16);
 
 	for (i=0;i<WAVES_COUNT;i++)
 		riffoser_wave_free(waves[i]);

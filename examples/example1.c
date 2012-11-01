@@ -34,7 +34,7 @@ int main(){
 
 	}
 
-	riffoser_track_writeriff(track,"example1.wav",44100,8);
+	riffoser_track_writewav(track,"example1.wav",44100,8);
 
 	for (i=0;i<300;i++) {
 		riffoser_wave_free(waves1[i]);
