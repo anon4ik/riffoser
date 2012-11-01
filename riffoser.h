@@ -109,6 +109,9 @@ extern void riffoser_track_addwave(struct riffoser_track * track,struct riffoser
 extern struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_amplitude_t amplitude,riffoser_frequency_t frequency,riffoser_pitch_t pitch);
 extern void riffoser_wave_free(struct riffoser_wave * wave);
 
+extern struct riffoser_instrument * riffoser_instrument_init();
+extern void riffoser_instrument_free(struct riffoser_instrument * instrument);
+
 #ifdef	__cplusplus
 }
 #endif

@@ -125,8 +125,8 @@ void riffoser_track_writeriff(struct riffoser_track * track,char * filename,riff
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
 						// can be improved somehow
-//						val=(val*vcount+fret)/(++vcount);
-						val+=fret;
+						val=(val*vcount+fret)/(++vcount);
+//						val+=fret;
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
 					}
 					else {
@@ -222,5 +222,13 @@ void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave *
 		track->length=to;
 }
 
+struct riffoser_instrument * riffoser_instrument_init() {
+	struct riffoser_instrument * instrument;
+	instrument=malloc(sizeof(struct riffoser_instrument));
+	memset(instrument,0,sizeof(struct riffoser_instrument));
+	return instrument;
+}
 
-
+void riffoser_instrument_free(struct riffoser_instrument * instrument) {
+	free(instrument);
+}
