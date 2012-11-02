@@ -139,19 +139,19 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 			}
 		}
 		if (bytespersample==1) {
-			ival=round(val*2.56)-128;
-			if (ival>127)
-				ival=127;
+			ival=round(val*2.56);
+			if (ival>255)
+				ival=255;
 		}
 		else if (bytespersample==2) {
-			ival=round(val*655.36);
-			if (ival>65535)
-				ival=65535;
+			ival=round(val*655.36)-32768;
+			if (ival>32767)
+				ival=32767;
 		}
 		else if (bytespersample==4) {
-			ival=round(val*42949672.96);
-			if (ival>4294967295)
-				ival=4294967295;
+			ival=round(val*42949672.96)-21474836.48;
+			if (ival>2147483647)
+				ival=2147483647;
 		}
 		riffoser_writeint(bytespersample,ival);
 		if ((c1==0)) {
@@ -208,31 +208,31 @@ struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t type,riffoser_perc
 	fread(&arg,padding,1,fp);\
 }
 #define riffoser_readbuf(buf,size) {\
-	fwrite(buf,size,1,fp);\
+	fread(buf,size,1,fp);\
 }
-struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length,riffoser_percent_t pitch) {
+struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
 	FILE * fp;
 	struct riffoser_wave * wave;
 	char * tmps;
 	unsigned int dlen,tmpi,samplerate,bitspersample,bytespersample;
 	unsigned short tmpw;
 	
+	char *buf;
 	
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
 	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
 	wave->type=_RIFFOSER_WAVE_DATA;
 	wave->amplitude=amplitude;
-	wave->pitch=pitch;
+	wave->pitch=50;
 	
 	fp=fopen(filename,"rb");
 	tmps=malloc(5);
 	riffoser_readstr(tmps,4);
 	
 	if (!strcmp(tmps,"RIFF")) { // its RIFF
-		printf("%s\n",tmps);
+//		printf("%s\n",tmps);
 		
-// riffoser_writeint(4,4+24+8+i1+(i1%2>0?1:0));
 		riffoser_readint(dlen,4);
 		
 		free(tmps);
@@ -264,14 +264,29 @@ struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percen
 					tmps=malloc(5);
 					riffoser_readstr(tmps,4);
 					
-					if (!strcmp(tmps,"data")) { // head was read correctly
-						riffoser_readint(wave->data_count,4);
-						wave->data=malloc(tmpi);
-						wave->frequency=1/(float)(wave->data_count/wave->channels/samplerate/bytespersample);
+					if (!strcmp(tmps,"data")) { // header was read correctly
+						riffoser_readint(tmpi,4);
+						buf=malloc(tmpi);
+						wave->frequency=length*1/(riffoser_frequency_t)(tmpi/(riffoser_frequency_t)wave->channels/(riffoser_frequency_t)samplerate/(riffoser_frequency_t)bytespersample)/100;
+						wave->data_count=tmpi/bytespersample;
+						wave->data=malloc(sizeof(double)*wave->data_count);
 						
-						riffoser_readbuf(wave->data,wave->data_count);						
+						riffoser_readbuf(buf,tmpi);
 						
-						printf("%u %s %u %u %u %u %u %s %lu\n",dlen,tmps,tmpi,wave->channels,samplerate,bitspersample,bytespersample,tmps,wave->data_count);
+						for (tmpi=0;tmpi<wave->data_count;tmpi++) {
+							if (bytespersample==1)
+								wave->data[tmpi]=(riffoser_data_t)(((((unsigned char *)buf)[tmpi]))*amplitude/256);
+							else if (bytespersample==2)
+								wave->data[tmpi]=(riffoser_data_t)(((((short *)buf)[tmpi])+32768)*amplitude*2/65536);
+							else if (bytespersample==4)
+								wave->data[tmpi]=(riffoser_data_t)((riffoser_data_t)((((int *)buf)[tmpi])+2147483648)*amplitude/4294967296);
+						}
+						
+						free(buf);
+						
+//						printf("%u %f %u\n",wave->data_count,wave->frequency,wave->data_count);
+						
+//						printf("%u %s %u %u %u %u %u %s %lu %f\n",dlen,tmps,tmpi,wave->channels,samplerate,bitspersample,bytespersample,tmps,wave->data_count,wave->frequency);
 					}
 				}
 			
