@@ -122,11 +122,14 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 						0&&printf("%lu: rendering wave %lu (%f-%f), samplenum is %f (%f%%)\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]),RIFFOSER_RENDER___TO(track->wavestates[i2]),track->wavestates[i2]->samplenum,RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						vcount++;
-						fret=fret*track->waves[i2]->amplitude/100/pow(vcount,2);
+						fret=fret*track->waves[i2]->amplitude/100/pow(vcount+1,2);
+						if (fret>100)
+							printf("fret>100 %f\n",fret);
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
-						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/2;
-						
+						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/2*pow(track->waves[i2]->channels,2);
+						if (val>100)
+							printf("val>100 %f\n",val);
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
 					}
 					else {
@@ -138,6 +141,8 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 		}
 		val*=vcount;
 		RIFFOSER_ENSUREBOUNDS(val,0,99);
+		if (val>100)
+			printf("(2) val>100 %f\n",val);
 		if (bytespersample==1) {
 			ival=round(val*2.56);
 			if (ival>255)
@@ -226,7 +231,10 @@ struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percen
 	wave->amplitude=amplitude;
 	wave->pitch=50;
 	
-	fp=fopen(filename,"rb");
+	if ((fp=fopen(filename,"rb"))==NULL) {
+		printf("failed to open file %s for reading!\n",filename);
+		return NULL;
+	}
 	tmps=malloc(5);
 	riffoser_readstr(tmps,4);
 	
@@ -320,6 +328,7 @@ void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave *
 		track->waves=realloc(track->waves,sizeof(struct riffoser_wave *)*(track->waves_count+1));
 		track->wavestates=realloc(track->wavestates,sizeof(struct riffoser_wavestate *)*(track->waves_count+1));
 	}
+	RIFFOSER_ENSUREBOUNDS(channel,0,track->channels-1);
 	track->waves[track->waves_count]=wave;
 	track->wavestates[track->waves_count]=malloc(sizeof(struct riffoser_wavestate));
 	memset(track->wavestates[track->waves_count],0,sizeof(struct riffoser_wavestate));
