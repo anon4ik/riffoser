@@ -1,0 +1,13 @@
+update README (and keep it up to date with changes)
+
+refactor libriffoser.c
+
+improve build system (autoconf-based?) - add "make examples" and "make install"
+
+create CONTRIBUTE with tasks currently free to be implemented
+
+implement riffoser_instrument
+
+implement riffoser_effect
+
+
