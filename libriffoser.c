@@ -59,7 +59,7 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 	unsigned long i1,i2,i3,i4,i5,i6,fpi;
 	unsigned char c1,bytespersample;
 	unsigned char * skipbuf;
-	float fret,val,phi1,phi2;
+	double fret,val;
 	long ival;
 	unsigned char nomorewaves,vcount;
 	riffoser_channel_t chan;
@@ -121,14 +121,12 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 							track->wavestates[i2]->samplenum-=RIFFOSER_RENDER___WSC(track->waves[i2]);
 						0&&printf("%lu: rendering wave %lu (%f-%f), samplenum is %f (%f%%)\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]),RIFFOSER_RENDER___TO(track->wavestates[i2]),track->wavestates[i2]->samplenum,RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
-						fret=fret*track->waves[i2]->amplitude/200;
+						vcount++;
+						fret=fret*track->waves[i2]->amplitude/100/pow(vcount,2);
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
-						// can be improved somehow
-//						phi1 = ((360° * dt) / track->wavestates[i2]->samplenum);
-						val=sqrt(val + pow(fret,2) + 2 * val * fret)/(val!=0?2:1);
-//						val=(val*vcount+fret)/(++vcount);
-//						val+=fret;
+						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/2;
+						
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
 					}
 					else {
@@ -138,6 +136,8 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 				}
 			}
 		}
+		val*=vcount;
+		RIFFOSER_ENSUREBOUNDS(val,0,99);
 		if (bytespersample==1) {
 			ival=round(val*2.56);
 			if (ival>255)

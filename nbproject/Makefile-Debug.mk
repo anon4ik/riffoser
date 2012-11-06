@@ -51,7 +51,7 @@ FFLAGS=
 ASFLAGS=
 
 # Link Libraries and Options
-LDLIBSOPTIONS=
+LDLIBSOPTIONS=-lm
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
@@ -59,7 +59,7 @@ LDLIBSOPTIONS=
 
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libriffoser.so: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	${LINK.c} -lm -shared -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libriffoser.so -fPIC ${OBJECTFILES} ${LDLIBSOPTIONS} 
+	${LINK.c} -shared -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/libriffoser.so -fPIC ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
 ${OBJECTDIR}/libriffoser.o: libriffoser.c 
 	${MKDIR} -p ${OBJECTDIR}

@@ -41,7 +41,9 @@
           </incDir>
         </cTool>
         <linkerTool>
-          <commandLine>-lm</commandLine>
+          <linkerLibItems>
+            <linkerLibStdlibItem>Mathematics</linkerLibStdlibItem>
+          </linkerLibItems>
         </linkerTool>
       </compileType>
     </conf>

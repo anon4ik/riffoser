@@ -14,7 +14,7 @@ extern "C" {
 #define riffoser_percent_t double
 #define riffoser_frequency_t double
 #define riffoser_wavetype_t unsigned char
-#define riffoser_trackpos_t float
+#define riffoser_trackpos_t double
 #define riffoser_wavestate_state_t unsigned char
 #define RIFFOSER_WAVESTATE_IDLE 0
 #define RIFFOSER_WAVESTATE_RENDERING 1
@@ -25,14 +25,14 @@ struct riffoser_wavestate {
 	riffoser_trackpos_t from;
 	riffoser_trackpos_t to;
 	riffoser_wavestate_state_t state;
-	float samplenum;
+	double samplenum;
 };
 
 struct riffoser_instrumentstate {
 	riffoser_wavestate_state_t state;
 	riffoser_trackpos_t from;
 	riffoser_trackpos_t to;
-	float samplenum;
+	double samplenum;
 	riffoser_channel_t channel;
 	riffoser_percent_t amplitude;
 	riffoser_frequency_t frequency;
@@ -50,7 +50,7 @@ struct riffoser_instrument {
 
 #define riffoser_samplerate_t unsigned int
 #define riffoser_bitspersample_t unsigned char
-#define riffoser_tracklen_t float
+#define riffoser_tracklen_t double
 struct riffoser_track {
 	riffoser_channel_t channels;
 	struct riffoser_wave ** waves;
