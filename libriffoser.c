@@ -149,7 +149,7 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 				ival=32767;
 		}
 		else if (bytespersample==4) {
-			ival=round(val*42949672.96)-21474836.48;
+			ival=round(val*42949672.96)-2147483648;
 			if (ival>2147483647)
 				ival=2147483647;
 		}
