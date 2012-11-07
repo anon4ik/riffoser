@@ -1,10 +1,61 @@
 riffoser
 
 by anon@anonymous.lv
+( contact at irc.freenode.net #riffoser )
 ========
 
 A C library to be used for comfortable music coding (see examples). generating RIFF sounds, combining them into tracks, adding effects, etc. other formats (MP3, S3M, ...) exporting is planned later
 
 ===============================================
 
-documentation not ready yet, please see examples/ to get the idea
+BUILDING LIBRARY
+
+first run "./configure" with necessary parameters (see ./configure --help)
+
+
+run "make" to build source
+run "make examples" to build files in examples/ directory
+run "make check" to build and run examples (you will have some .wav files in examples/ directory after that)
+run "make clean" to clean compiled source
+run "make distclean" to remove Makefiles too (to run ./configure again on totally clean source)
+run "make install" (with root privileges) to install compiled source (library and riffoser.h header)
+run "make uninstall" (with root privileges) to uninstall compiled source from system
+
+
+USING LIBRARY
+use -lriffoser flag in gcc command to link with riffoser
+
+
+CODE DOCUMENTATION
+
+documentation not ready yet (mainly because code is changing too rapidly now), please see examples/ to get the idea
+
+
+FOR CONTRIBUTORS
+1) it is adviceable to contact riffoser team on IRC - irc.freenode.net #riffoser prior to starting anything. maybe somebody already doing work you are planning? maybe your feature isn't really needed? you better ask us first.
+2) create a branch off "master" and work on it. it can be per-feature branch, or per-user branch
+3) you MUST do "make distclean" before making a commit, to prevent temporary files getting into repository
+4) also you must to "autoconf" prior to making a commit (if you changed anything in configure.ac), so configure script will be up to date
+5) after doing commit, push your branch to origin and create a pull request on github
+6) code well. change configure.ac and Makefile.in accordingly to features your code requires. use IFDEFs to check if your feature is to be built (i.e. if libmp3lame is available). don't assume every computer in the world will have libraries required for your code.
+7) no special code formatting is enforced, however, it is adviceable to comment things others may need to depend on in future
+8) you should always be in contact, preferrably on irc.freenode.net #riffoser , so we may discuss code comfortably
+9) you should use C , not some external languages like python or java that will make a mess. you may use C++, but make sure you alter build system accordingly for that (i.e. add checks for g++)
+10) code should be POSIX-compliant (work on most *NIX systems). if you require some i.e. linux-only feature, make it optional and reflect it in configure.ac (so could could just build without it on unsupported platforms)
+11) if you need to keep external files in source tree (i.e. netbeans's nbproject/) add it into .gitignore prior to committing
+12) riffoser.h is to be exported to system include directory. so, you put there only things that must be exported, not some MAX(a,b) defines that you will need. such defines should go to riffoser_r.h (runtime header) which is used only for library compilation. that's why .c files must include riffoser_r.h and not riffoser.h
+
+
+WHAT DO WE NEED ATM
+1) mp3 support (loading / saving), preferrably via libmp3lame
+2) writing documentation and updating it to reflect changes and new features in library. README.md , man pages, maybe a wiki. etc
+3) creating examples that show various features of library
+4) maybe we need a website. info, documentation, maybe interactive code interpretation / music composition with code output, etc
+5) maybe some UI music composer/streamer/sampler to demonstrate and test library functionality
+6) implementing new wave functions. now there are SQUARE, TRIANGLE, SINE and a bunch of experimental wave types. maybe you know some other?
+7) implementing instruments. instrument is a struct that you can add waves to and then play instrument on arbitrary frequences, volumes, etc. you may see instrument as a compound dynamic wave
+8) effects for instruments. obviously, instruments should be implemented first. effects may consist of fadein, fadeout, frequency changes, or some more complicated ones.
+9) bugfixes. if you found a bug, you may fix it, or you may tell us about it. either way we will be happy.
+10) any good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
+
+

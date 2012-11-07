@@ -33,7 +33,6 @@ int main(){
 
         riffoser_track_free(track);
 
-        system("aplay test.wav");
-
+	exit(EXIT_SUCCESS);
 }
 

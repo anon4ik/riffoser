@@ -38,4 +38,6 @@ int main(){
 
         riffoser_track_free(track);
 
+	exit(EXIT_SUCCESS);
+
 }

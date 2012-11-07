@@ -1,0 +1,74 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+VERSION_MAJOR=@VERSION_MAJOR@
+VERSION_MINOR=@VERSION_MINOR@
+
+LIBS=@libs@
+DEFS=@defs@
+
+CC=@CC@
+MKDIR=@CC@
+RM=@RM@
+CHMOD=@CHMOD@
+INSTALL=@INSTALL@
+LN=@LN@
+
+VERSION=@VERSION@
+
+COMPILEDEBUG=-g -MP
+COMPILERELEASE=-s -O2 -Wno-unused-result
+COMPILEEXTRA=@compileextra@
+COMPILE=${CC} ${DEFS} -I. -MMD -fPIC ${COMPILEEXTRA} -c
+
+all: libriffoser.so
+
+libriffoser.so: riffoser.o track.o wave.o instrument.o
+	${CC} -shared -o libriffoser.so -fPIC *.o ${LIBS} ${COMPILEEXTRA}
+
+clean: clean-examples
+	rm -f *.o *.o.d *.so
+
+distclean: clean
+	rm -f Makefile
+
+riffoser.o: riffoser.c Makefile
+	${COMPILE} -MF riffoser.o.d -o riffoser.o riffoser.c
+
+track.o: track.c Makefile
+	${COMPILE} -MF track.o.d -o track.o track.c
+
+wave.o: wave.c Makefile
+	${COMPILE} -MF wave.o.d -o wave.o wave.c
+
+instrument.o: instrument.c Makefile
+	${COMPILE} -MF instrument.o.d -o instrument.o instrument.c
+
+examples: libriffoser.so examples/*.c Makefile
+	for file in examples/*.c ; do\
+		${CC} $$file -o $${file%.c} -I. -lriffoser -L. -Wl,-rpath -Wl,`pwd` &&\
+		${CHMOD} +x $${file%.c};\
+	done
+
+clean-examples:
+	for file in examples/*.c ; do\
+		${RM} -f $${file%.c};\
+	done
+	rm -f examples/*.wav
+
+check: examples
+	@cd examples &&\
+	for file in *.c ; do\
+		printf "Running "$${file%.c}"...";\
+		./$${file%.c} && echo "OK" || echo "FAILED";\
+	done
+
+install: all
+	install -Dv riffoser.h ${includedir}
+	install -Dv libriffoser.so ${libdir}/libriffoser.so.${VERSION_MAJOR}.${VERSION_MINOR}
+	ln -vs libriffoser.so.${VERSION_MAJOR}.${VERSION_MINOR} ${libdir}/libriffoser.so.${VERSION_MAJOR}
+	ln -vs libriffoser.so.${VERSION_MAJOR} ${libdir}/libriffoser.so
+
+uninstall:
+	rm -vf ${includedir}/riffoser.h ${libdir}/libriffoser.so ${libdir}/libriffoser.so.${VERSION_MAJOR} ${libdir}/libriffoser.so.${VERSION_MAJOR}.${VERSION_MINOR}
