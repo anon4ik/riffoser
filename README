@@ -57,6 +57,10 @@ WHAT DO WE NEED ATM
 7) implementing instruments. instrument is a struct that you can add waves to and then play instrument on arbitrary frequences, volumes, etc. you may see instrument as a compound dynamic wave
 8) effects for instruments. obviously, instruments should be implemented first. effects may consist of fadein, fadeout, frequency changes, or some more complicated ones.
 9) bugfixes. if you found a bug, you may fix it, or you may tell us about it. either way we will be happy.
-10) any good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
+10) sound output support (OSS,ALSA,maybe others). i.e. functions like riffoser_track_play
+11) maybe sound input support (microphone etc)
+12) maybe web-based output similar to icecast
+13) various utils, like converting WAV format, etc
+14) any other good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
 
 
