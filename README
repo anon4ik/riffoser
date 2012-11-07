@@ -24,6 +24,7 @@ run "make uninstall" (with root privileges) to uninstall compiled source from sy
 
 USING LIBRARY
 use -lriffoser flag in gcc command to link with riffoser
+use #include <riffoser.h> to use its header
 
 
 CODE DOCUMENTATION
@@ -35,7 +36,7 @@ FOR CONTRIBUTORS
 1) it is adviceable to contact riffoser team on IRC - irc.freenode.net #riffoser prior to starting anything. maybe somebody already doing work you are planning? maybe your feature isn't really needed? you better ask us first.
 2) create a branch off "master" and work on it. it can be per-feature branch, or per-user branch
 3) you MUST do "make distclean" before making a commit, to prevent temporary files getting into repository
-4) also you must to "autoconf" prior to making a commit (if you changed anything in configure.ac), so configure script will be up to date
+4) also you must run "autoconf" prior to making a commit (if you changed anything in configure.ac), so configure script will be up to date
 5) after doing commit, push your branch to origin and create a pull request on github
 6) code well. change configure.ac and Makefile.in accordingly to features your code requires. use IFDEFs to check if your feature is to be built (i.e. if libmp3lame is available). don't assume every computer in the world will have libraries required for your code.
 7) no special code formatting is enforced, however, it is adviceable to comment things others may need to depend on in future
