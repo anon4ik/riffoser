@@ -6,27 +6,44 @@ extern "C" {
 #endif
 
 #include <riffoser.h>
+#include <wavefuncs.h>
 	
-#define RIFFOSER_WAVE_FUNC(_wave,x) {\
-	if (_wave->type==RIFFOSER_WAVE_SQUARE)\
-		fret=x<_wave->pitch?0:100;\
-	else if (_wave->type==RIFFOSER_WAVE_TRIANGLE)\
-		fret=x<_wave->pitch?x*2:100-(x-_wave->pitch)*2;\
-	else if (_wave->type==RIFFOSER_WAVE_SINE)\
-		fret=100*sin(2*M_PI*x/100+_wave->pitch);/*x<_wave->pitch?sin(x)*100:sin(100-(x-_wave->pitch)*2);*/\
-	else if (_wave->type==RIFFOSER_WAVE_COSINUSOID)\
-		fret=x<_wave->pitch?cos(x)*100:cos(100-(x-_wave->pitch)*2);\
-	else if (_wave->type==RIFFOSER_WAVE_TEST1)\
-		fret=30*(cos(M_PI*(x+1))-sin(2*M_PI*x/100))/*x<_wave->pitch?tan(x)*100:tan(100-(x-_wave->pitch)*2)*100*/;\
-	else if (_wave->type==_RIFFOSER_WAVE_DATA)\
-		fret=_wave->data[(unsigned long)ceil((double)x*(double)((double)_wave->data_count/100))+(chan<track->channels?chan:0)];\
-}
-
+	struct riffoser_io_struct {
+		char *src;
+		unsigned long srcsize;
+		riffoser_bytespersample_t bytespersample;
+		riffoser_samplerate_t samplerate;
+		char *filename;
+		riffoser_channel_t channels;
+		riffoser_kbps_t kbps;
+	};
+	
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
 		v=min;\
 	else if (v>max)\
 		v=max;\
+} 
+
+#define riffoser_readstr(arg,size) {\
+	fread(arg,size,1,fp);\
+	arg[size]='\0';\
+}
+#define riffoser_readint(arg,padding) {\
+	fread(&arg,padding,1,fp);\
+}
+#define riffoser_readbuf(buf,size) {\
+	fread(buf,size,1,fp);\
+}
+#define riffoser_writestr(value) {\
+	fprintf(fp,value);\
+}
+#define riffoser_writeint(padding,value) {\
+	fpi=value;\
+	fwrite((const void *)&fpi,padding,1,fp);\
+}
+#define riffoser_writebuf(size,buf) {\
+	fwrite(buf,size,1,fp);\
 }
 
 #ifdef	__cplusplus

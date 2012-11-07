@@ -24,7 +24,7 @@ COMPILE=${CC} ${DEFS} -I. -MMD -fPIC ${COMPILEEXTRA} -c
 
 all: libriffoser.so
 
-libriffoser.so: riffoser.o track.o wave.o instrument.o
+libriffoser.so: riffoser.o track.o wave.o instrument.o wav.o mp3.o
 	${CC} -shared -o libriffoser.so -fPIC *.o ${LIBS} ${COMPILEEXTRA}
 
 clean: clean-examples
@@ -33,19 +33,25 @@ clean: clean-examples
 distclean: clean
 	${RM} -f Makefile
 
-riffoser.o: riffoser.c Makefile
+riffoser.o: riffoser.c Makefile *.h
 	${COMPILE} -MF riffoser.o.d -o riffoser.o riffoser.c
 
-track.o: track.c Makefile
+track.o: track.c Makefile *.h
 	${COMPILE} -MF track.o.d -o track.o track.c
 
-wave.o: wave.c Makefile
+wave.o: wave.c Makefile *.h
 	${COMPILE} -MF wave.o.d -o wave.o wave.c
 
-instrument.o: instrument.c Makefile
+instrument.o: instrument.c Makefile *.h
 	${COMPILE} -MF instrument.o.d -o instrument.o instrument.c
 
-examples: libriffoser.so examples/*.c Makefile
+wav.o: wav.c Makefile *.h
+	${COMPILE} -MF wav.o.d -o wav.o wav.c
+
+mp3.o: mp3.c Makefile *.h
+	${COMPILE} -MF mp3.o.d -o mp3.o mp3.c
+
+examples: examples/*.c libriffoser.so Makefile
 	for file in examples/*.c ; do\
 		${CC} $$file -o $${file%.c} -I. -lriffoser -L. -Wl,-rpath -Wl,`pwd` &&\
 		${CHMOD} +x $${file%.c};\
@@ -55,7 +61,7 @@ clean-examples:
 	for file in examples/*.c ; do\
 		${RM} -f $${file%.c};\
 	done
-	${RM} -f examples/*.wav
+	${RM} -f examples/*.wav *.wav
 
 check: examples
 	@cd examples &&\
@@ -72,3 +78,5 @@ install: all
 
 uninstall:
 	${RM} -vf ${includedir}/riffoser.h ${libdir}/libriffoser.so ${libdir}/libriffoser.so.${VERSION_MAJOR} ${libdir}/libriffoser.so.${VERSION_MAJOR}.${VERSION_MINOR}
+
+

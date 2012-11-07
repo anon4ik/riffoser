@@ -59,6 +59,8 @@ struct riffoser_instrument {
 
 #define riffoser_samplerate_t unsigned int
 #define riffoser_bitspersample_t unsigned char
+#define riffoser_bytespersample_t unsigned char
+#define riffoser_kbps_t unsigned short
 #define riffoser_tracklen_t double
 struct riffoser_track {
 	riffoser_channel_t channels;
