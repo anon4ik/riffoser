@@ -49,7 +49,7 @@ FOR CONTRIBUTORS
 7) no special code formatting is enforced, however, it is adviceable to comment things others may need to depend on in future
 8) you should always be in contact, preferrably on irc.freenode.net #riffoser , so we may discuss code comfortably
 9) you should use C , not some external languages like python or java that will make a mess. you may use C++, but make sure you alter build system accordingly for that (i.e. add checks for g++)
-10) code should be POSIX-compliant (work on most *NIX systems). if you require some i.e. linux-only feature, make it optional and reflect it in configure.ac (so could could just build without it on unsupported platforms)
+10) code should be POSIX-compliant (work on most *NIX systems). if you require some i.e. linux-only feature, make it optional and reflect it in configure.ac (so riffoser could just build without it on unsupported platforms)
 11) if you need to keep external files in source tree (i.e. netbeans's nbproject/) add it into .gitignore prior to committing
 12) riffoser.h is to be exported to system include directory. so, you put there only things that must be exported, not some MAX(a,b) defines that you will need. such defines should go to riffoser_r.h (runtime header) which is used only for library compilation. that's why .c files must include riffoser_r.h and not riffoser.h
 13) functions, defines and everything else that will be exported must start with riffoser_ , to avoid possible conflicts with other libraries
@@ -59,19 +59,20 @@ FOR CONTRIBUTORS
 WHAT DO WE NEED ATM
 1) mp3 support (loading / saving), preferrably via libmp3lame
 2) ogg support (libogg), s3m support (libmikmod)
-3) writing documentation and updating it to reflect changes and new features in library. README.md , man pages, maybe a wiki. etc
-4) creating examples that show various features of library
-5) maybe we need a website. info, documentation, maybe interactive code interpretation / music composition with code output, etc
-6) maybe some UI music composer/streamer/sampler to demonstrate and test library functionality
-7) implementing new wave functions. now there are SQUARE, TRIANGLE, SINE and a bunch of experimental wave types. maybe you know some other?
-8) implementing instruments. instrument is a struct that you can add waves to and then play instrument on arbitrary frequences, volumes, etc. you may see instrument as a compound dynamic wave
-9) effects for instruments. obviously, instruments should be implemented first. effects may consist of fadein, fadeout, frequency changes, or some more complicated ones.
-10) bugfixes. if you found a bug, you may fix it, or you may tell us about it. either way we will be happy.
-11) sound output support (OSS,ALSA,maybe others). i.e. functions like riffoser_track_play
-12) maybe sound input support (microphone etc)
-13) maybe web-based output similar to icecast
-14) various utils, like converting WAV format, etc
-15) pthreads support to utilize multi-code processors better
-16) any other good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
+3) other WAV formats (non-PCM formats, compressed formats)
+4) writing documentation and updating it to reflect changes and new features in library. README.md , man pages, maybe a wiki. etc
+5) creating examples that show various features of library
+6) maybe we need a website. info, documentation, maybe interactive code interpretation / music composition with code output, etc
+7) maybe some UI music composer/streamer/sampler to demonstrate and test library functionality
+8) implementing new wave functions. now there are SQUARE, TRIANGLE, SINE and a bunch of experimental wave types. maybe you know some other?
+9) implementing instruments. instrument is a struct that you can add waves to and then play it on arbitrary frequences, volumes, etc. you may see instrument as a compound dynamic wave
+10) effects for instruments. obviously, instruments should be implemented first. effects may consist of fadein, fadeout, frequency changes, or some more complicated ones.
+11) bugfixes. if you found a bug, you may fix it, or you may tell us about it. either way we will be happy.
+12) sound output support (OSS,ALSA,maybe others). i.e. functions like riffoser_track_play
+13) maybe sound input support (microphone etc)
+14) maybe web-based output similar to icecast
+15) various utils, like converting WAV formats, etc
+16) pthreads support to utilize multi-code processors better
+17) any other good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
 
 
