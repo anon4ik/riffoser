@@ -8,6 +8,13 @@ A C library to be used for comfortable music coding (see examples). generating R
 
 ===============================================
 
+OBTAINING THE SOURCE
+
+to get latest buildable source tree, install git, then use command:
+git clone https://github.com/anon4ik/riffoser.git
+
+
+
 BUILDING LIBRARY
 
 first run "./configure" with necessary parameters (see ./configure --help)
@@ -45,6 +52,8 @@ FOR CONTRIBUTORS
 10) code should be POSIX-compliant (work on most *NIX systems). if you require some i.e. linux-only feature, make it optional and reflect it in configure.ac (so could could just build without it on unsupported platforms)
 11) if you need to keep external files in source tree (i.e. netbeans's nbproject/) add it into .gitignore prior to committing
 12) riffoser.h is to be exported to system include directory. so, you put there only things that must be exported, not some MAX(a,b) defines that you will need. such defines should go to riffoser_r.h (runtime header) which is used only for library compilation. that's why .c files must include riffoser_r.h and not riffoser.h
+13) functions, defines and everything else that will be exported must start with riffoser_ , to avoid possible conflicts with other libraries
+14) don't push unbuildable source to origin. make it build first (and doing "make check" is recommended)
 
 
 WHAT DO WE NEED ATM
