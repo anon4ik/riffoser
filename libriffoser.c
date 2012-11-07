@@ -123,13 +123,13 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						vcount++;
 						fret=fret*track->waves[i2]->amplitude/100/pow(vcount+1,2);
-						if (fret>100)
-							printf("fret>100 %f\n",fret);
+						if (fret>99)
+							printf("fret>99 %f\n",fret);
 						RIFFOSER_ENSUREBOUNDS(fret,0,99);
 						
-						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/2*pow(track->waves[i2]->channels,2);
-						if (val>100)
-							printf("val>100 %f\n",val);
+						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/pow(vcount+1,2)*pow(track->waves[i2]->channels,2);
+						if (val>99)
+							printf("val>99 %f\n",val);
 						RIFFOSER_ENSUREBOUNDS(val,0,99);
 					}
 					else {
@@ -200,6 +200,7 @@ struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t type,riffoser_perc
 	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
 	wave->amplitude=amplitude;
 	wave->frequency=frequency;
+	wave->channels=1;
 	RIFFOSER_ENSUREBOUNDS(pitch,0,99);
 	wave->pitch=pitch;
 	return wave;

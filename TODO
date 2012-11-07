@@ -1,5 +1,3 @@
-update README (and keep it up to date with changes)
-
 refactor libriffoser.c
 
 improve build system (autoconf-based?) - add "make examples" and "make install"
