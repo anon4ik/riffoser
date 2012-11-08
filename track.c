@@ -25,20 +25,6 @@ void riffoser_track_free(struct riffoser_track * track) {
 	free(track);
 }
 
-void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {
-	struct riffoser_io_struct *io;
-	io=malloc(sizeof(struct riffoser_io_struct));
-	memset(io,0,sizeof(struct riffoser_io_struct));
-	io->bytespersample=bitspersample*8;
-	io->channels=track->channels;
-	io->filename=filename;
-	io->kbps=kbps;
-	io->samplerate=samplerate;
-	io->srcsize=0; // stub
-	riffoser_mp3_savetofile(io);
-	free(io);
-}
-
 #define RIFFOSER_RENDER___INITWAVES \
 	for (i2=0;i2<track->waves_count;i2++) {\
 		if (floor(RIFFOSER_RENDER___FROM(track->wavestates[i2]))==i5) {\
@@ -46,27 +32,19 @@ void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffo
 			0&&printf("%lu: wave %lu started\n",i1,i2);\
 		}\
 	}
-#define RIFFOSER_RENDER___FROM(_v) (track->channels*samplerate*_v->from)
-#define RIFFOSER_RENDER___TO(_v) (track->channels*samplerate*_v->to)
-#define RIFFOSER_RENDER___WSC(_w) ((1*samplerate/_w->frequency))
+#define RIFFOSER_RENDER___FROM(_v) (track->channels*io->samplerate*_v->from)
+#define RIFFOSER_RENDER___TO(_v) (track->channels*io->samplerate*_v->to)
+#define RIFFOSER_RENDER___WSC(_w) ((1*io->samplerate/_w->frequency))
 #define RIFFOSER_RENDER___WPP(_w,_wp) (_wp*100/RIFFOSER_RENDER___WSC(_w))
-void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample) {
+void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_struct *io) {
 	unsigned long i1,i2,i3,i4,i5,i6;
-	unsigned char c1,bytespersample;
-	unsigned char * skipbuf;
+	unsigned char nomorewaves,vcount,c1;
 	double fret,val;
-	long ival;
-	unsigned char nomorewaves,vcount;
+	long long ival;
 	riffoser_channel_t chan;
-	struct riffoser_io_struct *io;
-	bytespersample=bitspersample/8;
-	io=malloc(sizeof(struct riffoser_io_struct));
-	memset(io,0,sizeof(struct riffoser_io_struct));
-	io->filename=filename;
-	io->samplerate=samplerate;
-	io->bytespersample=bytespersample;
+	
 	io->channels=track->channels;
-	io->srcsize=track->channels*samplerate*bytespersample*track->length;
+	io->srcsize=track->channels*io->samplerate*io->bytespersample*track->length;
 	io->src=malloc(io->srcsize);
 	memset(io->src,0,io->srcsize);
 	
@@ -131,19 +109,19 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 		RIFFOSER_ENSUREBOUNDS(val,0,99);
 		if (val>100)
 			printf("(2) val>100 %f\n",val);
-		if (bytespersample==1) {
+		if (io->bytespersample==1) {
 			ival=round(val*2.56);
 			if (ival>255)
 				ival=255;
 			((unsigned char *)io->src)[i1]=(unsigned char)ival;
 		}
-		else if (bytespersample==2) {
+		else if (io->bytespersample==2) {
 			ival=round(val*655.36)-32768;
 			if (ival>32767)
 				ival=32767;
 			((short *)io->src)[i1]=(short)ival;
 		}
-		else if (bytespersample==4) {
+		else if (io->bytespersample==4) {
 			ival=round(val*42949672.96)-2147483648;
 			if (ival>2147483647)
 				ival=2147483647;
@@ -153,7 +131,7 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 		if ((c1==0)) {
 			if ((i3!=track->waves_count)) {
 				0&&printf("%lu: warping to position %lu\n",i1,i5);
-				i4=(i5-i1+chan)*bytespersample;
+				i4=(i5-i1+chan)*io->bytespersample;
 /*				skipbuf=malloc(i4);
 				memset(skipbuf,0,i4);
 				riffoser_writebuf(i4,skipbuf);
@@ -178,6 +156,33 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 	//usleep(100000);
 	}
 	
+}
+
+void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {
+	struct riffoser_io_struct *io;
+	io=malloc(sizeof(struct riffoser_io_struct));
+	memset(io,0,sizeof(struct riffoser_io_struct));
+	io->bytespersample=bitspersample*8;
+	io->channels=track->channels;
+	io->filename=filename;
+	io->kbps=kbps;
+	io->samplerate=samplerate;
+	
+	riffoser_track_preparesrc(track,io);
+	riffoser_mp3_savetofile(io);
+	
+	free(io);
+}
+
+void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample) {
+	struct riffoser_io_struct *io;
+	io=malloc(sizeof(struct riffoser_io_struct));
+	memset(io,0,sizeof(struct riffoser_io_struct));
+	io->filename=filename;
+	io->samplerate=samplerate;
+	io->bytespersample=bitspersample/8;
+	
+	riffoser_track_preparesrc(track,io);
 	riffoser_wav_savetofile(io);
 	
 	free(io->src);
