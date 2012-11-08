@@ -24,7 +24,7 @@ COMPILE=${CC} ${DEFS} -I. -MMD -fPIC ${COMPILEEXTRA} -c
 
 all: libriffoser.so
 
-libriffoser.so: riffoser.o track.o wave.o instrument.o wav.o mp3.o
+libriffoser.so: riffoser.o track.o wave.o instrument.o wav.o mp3.o ogg.o
 	${CC} -shared -o libriffoser.so -fPIC *.o ${LIBS} ${COMPILEEXTRA}
 
 clean: clean-examples
@@ -51,6 +51,9 @@ wav.o: wav.c Makefile *.h
 mp3.o: mp3.c Makefile *.h
 	${COMPILE} -MF mp3.o.d -o mp3.o mp3.c
 
+ogg.o: ogg.c Makefile *.h
+	${COMPILE} -MF ogg.o.d -o ogg.o ogg.c
+
 examples: examples/*.c libriffoser.so Makefile
 	for file in examples/*.c ; do\
 		${CC} $$file -o $${file%.c} -I. -lriffoser -L. -Wl,-rpath -Wl,`pwd` &&\
@@ -61,7 +64,7 @@ clean-examples:
 	for file in examples/*.c ; do\
 		${RM} -f $${file%.c};\
 	done
-	${RM} -f examples/*.wav *.wav
+	${RM} -f {,examples/}*.{wav,ogg}
 
 check: examples
 	@cd examples &&\

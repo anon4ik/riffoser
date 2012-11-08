@@ -48,8 +48,10 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 	io->src=malloc(io->srcsize);
 	memset(io->src,0,io->srcsize);
 	
-	i1=0;
 	i3=track->waves_count;
+	for (i1=0;i1<i3;i1++)
+		track->wavestates[i1]->state=RIFFOSER_WAVESTATE_IDLE;
+	i1=0;
 	i6=0;
 	nomorewaves=0;
 	while (1) {
@@ -113,19 +115,22 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 			ival=round(val*2.56);
 			if (ival>255)
 				ival=255;
-			((unsigned char *)io->src)[i1]=(unsigned char)ival;
+			if (i1<io->srcsize)
+				((unsigned char *)io->src)[i1]=(unsigned char)ival;
 		}
 		else if (io->bytespersample==2) {
 			ival=round(val*655.36)-32768;
 			if (ival>32767)
 				ival=32767;
-			((short *)io->src)[i1]=(short)ival;
+			if (i1*2<io->srcsize)
+				((short *)io->src)[i1]=(short)ival;
 		}
 		else if (io->bytespersample==4) {
 			ival=round(val*42949672.96)-2147483648;
 			if (ival>2147483647)
 				ival=2147483647;
-			((int *)io->src)[i1]=(int)ival;
+			if (i1*4<io->srcsize)
+				((int *)io->src)[i1]=(int)ival;
 		}
 		//riffoser_writeint(bytespersample,ival);
 		if ((c1==0)) {
@@ -156,6 +161,23 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 	//usleep(100000);
 	}
 	
+}
+
+void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {
+	struct riffoser_io_struct *io;
+	io=malloc(sizeof(struct riffoser_io_struct));
+	memset(io,0,sizeof(struct riffoser_io_struct));
+	io->filename=filename;
+	io->samplerate=samplerate;
+	io->bytespersample=bitspersample/8;
+	io->kbps=kbps;
+	io->channels=track->channels;
+	
+	riffoser_track_preparesrc(track,io);
+	riffoser_ogg_savetofile(io);
+	
+	free(io->src);
+	free(io);
 }
 
 void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {

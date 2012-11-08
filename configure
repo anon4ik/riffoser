@@ -662,6 +662,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_lame
+with_ogg
 with_debug
 '
       ac_precious_vars='build_alias
@@ -1284,6 +1285,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-lame             enable mp3 encoding/decoding functions via liblame [auto]
+  --with-ogg              enable ogg encoding/decoding functions via libogg/libvorbis [auto]
   --with-debug            debug build [no]
 
 Some influential environment variables:
@@ -2017,6 +2019,12 @@ VERSION_MINOR=1
 # Check whether --with-lame was given.
 if test "${with_lame+set}" = set; then :
   withval=$with_lame;
+fi
+
+
+# Check whether --with-ogg was given.
+if test "${with_ogg+set}" = set; then :
+  withval=$with_ogg;
 fi
 
 
@@ -3602,6 +3610,161 @@ if test "x$use_lame" == "xyes"
 then
 	libs=$libs" -lmp3lame"
 	defs=$defs" -DUSE_LAME"
+fi
+
+if test "x$with_ogg" != "xno"
+then
+	use_ogg=yes
+        for ac_header in ogg/ogg.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "ogg/ogg.h" "ac_cv_header_ogg_ogg_h" "$ac_includes_default"
+if test "x$ac_cv_header_ogg_ogg_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_OGG_OGG_H 1
+_ACEOF
+
+else
+  use_ogg=no
+fi
+
+done
+
+	for ac_header in vorbis/codec.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "vorbis/codec.h" "ac_cv_header_vorbis_codec_h" "$ac_includes_default"
+if test "x$ac_cv_header_vorbis_codec_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_VORBIS_CODEC_H 1
+_ACEOF
+
+else
+  use_ogg=no
+fi
+
+done
+
+	for ac_header in vorbis/vorbisenc.h
+do :
+  ac_fn_c_check_header_mongrel "$LINENO" "vorbis/vorbisenc.h" "ac_cv_header_vorbis_vorbisenc_h" "$ac_includes_default"
+if test "x$ac_cv_header_vorbis_vorbisenc_h" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_VORBIS_VORBISENC_H 1
+_ACEOF
+
+else
+  use_ogg=no
+fi
+
+done
+
+        if test "x$use_ogg" != "xno"
+        then
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for ogg_sync_init in -logg" >&5
+$as_echo_n "checking for ogg_sync_init in -logg... " >&6; }
+if ${ac_cv_lib_ogg_ogg_sync_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-logg  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ogg_sync_init ();
+int
+main ()
+{
+return ogg_sync_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ogg_ogg_sync_init=yes
+else
+  ac_cv_lib_ogg_ogg_sync_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ogg_ogg_sync_init" >&5
+$as_echo "$ac_cv_lib_ogg_ogg_sync_init" >&6; }
+if test "x$ac_cv_lib_ogg_ogg_sync_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBOGG 1
+_ACEOF
+
+  LIBS="-logg $LIBS"
+
+else
+  use_ogg=no
+fi
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for vorbis_encode_init in -lvorbisenc" >&5
+$as_echo_n "checking for vorbis_encode_init in -lvorbisenc... " >&6; }
+if ${ac_cv_lib_vorbisenc_vorbis_encode_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lvorbisenc  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char vorbis_encode_init ();
+int
+main ()
+{
+return vorbis_encode_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_vorbisenc_vorbis_encode_init=yes
+else
+  ac_cv_lib_vorbisenc_vorbis_encode_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_vorbisenc_vorbis_encode_init" >&5
+$as_echo "$ac_cv_lib_vorbisenc_vorbis_encode_init" >&6; }
+if test "x$ac_cv_lib_vorbisenc_vorbis_encode_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBVORBISENC 1
+_ACEOF
+
+  LIBS="-lvorbisenc $LIBS"
+
+else
+  use_ogg=no
+fi
+
+        fi
+        if test "x$use_ogg" == "xno" && test "x$with_ogg" == "xyes"
+        then
+                as_fn_error $? "No usable ogg/vorbis headers or/and libraries found. Please install them or run configure without --with-ogg" "$LINENO" 5
+        fi
+else
+        use_ogg=no
+fi
+if test "x$use_ogg" == "xyes"
+then
+        libs=$libs" -logg -lvorbisenc"
+        defs=$defs" -DUSE_OGGVORBIS"
 fi
 
 libs=$libs
