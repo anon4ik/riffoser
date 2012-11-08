@@ -2,8 +2,8 @@ AC_INIT(riffoser, version-0.1)
 AC_SUBST(VERSION_MAJOR,0)
 AC_SUBST(VERSION_MINOR,1)
 
-AC_ARG_WITH(lame, [  --with-lame             enable mp3 encoding functions via liblame [[auto]]])
-AC_ARG_WITH(debug, [  --with-debug         debug build [[no]]])
+AC_ARG_WITH(lame, [  --with-lame             enable mp3 encoding/decoding functions via liblame [[auto]]])
+AC_ARG_WITH(debug, [  --with-debug            debug build [[no]]])
 
 AC_PROG_CC
 

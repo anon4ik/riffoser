@@ -1283,8 +1283,8 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-lame             enable mp3 encoding functions via liblame [auto]
-  --with-debug         debug build [no]
+  --with-lame             enable mp3 encoding/decoding functions via liblame [auto]
+  --with-debug            debug build [no]
 
 Some influential environment variables:
   CC          C compiler command
