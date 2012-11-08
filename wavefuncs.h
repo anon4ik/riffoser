@@ -16,8 +16,12 @@ extern "C" {
 		fret=x<_wave->pitch?cos(x)*100:cos(100-(x-_wave->pitch)*2);\
 	else if (_wave->type==RIFFOSER_WAVE_TEST1)\
 		fret=30*(cos(M_PI*(x+1))-sin(2*M_PI*x/100))/*x<_wave->pitch?tan(x)*100:tan(100-(x-_wave->pitch)*2)*100*/;\
-	else if (_wave->type==_RIFFOSER_WAVE_DATA)\
-		fret=_wave->data[(unsigned long)ceil((double)x*(double)((double)_wave->data_count/100))+(chan<track->channels?chan:0)];\
+	else if (_wave->type==_RIFFOSER_WAVE_DATA){\
+		i7=(unsigned long)floor((double)x*(double)((double)_wave->data_count/100))+(chan<track->channels?chan:0);\
+		if (i7>=_wave->data_count)\
+			i7=_wave->data_count-1;\
+		fret=_wave->data[i7];\
+	}\
 }
 
 #ifdef	__cplusplus

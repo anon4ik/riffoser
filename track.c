@@ -37,7 +37,7 @@ void riffoser_track_free(struct riffoser_track * track) {
 #define RIFFOSER_RENDER___WSC(_w) ((1*io->samplerate/_w->frequency))
 #define RIFFOSER_RENDER___WPP(_w,_wp) (_wp*100/RIFFOSER_RENDER___WSC(_w))
 void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_struct *io) {
-	unsigned long i1,i2,i3,i4,i5,i6;
+	unsigned long i1,i2,i3,i4,i5,i6,i7;
 	unsigned char nomorewaves,vcount,c1;
 	double fret,val;
 	long long ival;
