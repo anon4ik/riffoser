@@ -3,6 +3,7 @@ AC_SUBST(VERSION_MAJOR,0)
 AC_SUBST(VERSION_MINOR,1)
 
 AC_ARG_WITH(lame, [  --with-lame             enable mp3 encoding/decoding functions via liblame [[auto]]])
+AC_ARG_WITH(ogg, [  --with-ogg              enable ogg encoding/decoding functions via libogg/libvorbis [[auto]]])
 AC_ARG_WITH(debug, [  --with-debug            debug build [[no]]])
 
 AC_PROG_CC
@@ -80,6 +81,30 @@ if test "x$use_lame" == "xyes"
 then
 	libs=$libs" -lmp3lame"
 	defs=$defs" -DUSE_LAME"
+fi
+
+if test "x$with_ogg" != "xno"
+then
+	use_ogg=yes
+        AC_CHECK_HEADERS([ogg/ogg.h], [], [use_ogg=no])
+	AC_CHECK_HEADERS([vorbis/codec.h], [], [use_ogg=no])
+	AC_CHECK_HEADERS([vorbis/vorbisenc.h], [], [use_ogg=no])
+        if test "x$use_ogg" != "xno"
+        then
+                AC_CHECK_LIB(ogg, ogg_sync_init, [], [use_ogg=no])
+		AC_CHECK_LIB(vorbisenc, vorbis_encode_init, [], [use_ogg=no])
+        fi
+        if test "x$use_ogg" == "xno" && test "x$with_ogg" == "xyes"
+        then
+                AC_MSG_ERROR([No usable ogg/vorbis headers or/and libraries found. Please install them or run configure without --with-ogg])
+        fi
+else
+        use_ogg=no
+fi
+if test "x$use_ogg" == "xyes"
+then
+        libs=$libs" -logg -lvorbisenc"
+        defs=$defs" -DUSE_OGGVORBIS"
 fi
 
 AC_SUBST(libs,$libs)
