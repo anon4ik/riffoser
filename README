@@ -22,7 +22,7 @@ first run "./configure" with necessary parameters (see ./configure --help)
 
 run "make" to build source
 run "make examples" to build files in examples/ directory
-run "make check" to build and run examples (you will have some .wav files in examples/ directory after that)
+run "make check" to build and run examples (you will have some .wav and .ogg files in examples/ directory after that)
 run "make clean" to clean compiled source
 run "make distclean" to remove Makefiles too (to run ./configure again on totally clean source)
 run "make install" (with root privileges) to install compiled source (library and riffoser.h header)

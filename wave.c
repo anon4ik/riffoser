@@ -64,6 +64,30 @@ struct riffoser_wave *riffoser_wave_loadfrommp3(char *filename,riffoser_percent_
 	return wave;
 }
 
+struct riffoser_wave *riffoser_wave_loadfromogg(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
+	struct riffoser_wave *wave;
+	struct riffoser_io_struct *io;
+	
+	wave=malloc(sizeof(struct riffoser_wave));
+	memset(wave,0,sizeof(struct riffoser_wave));
+	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
+	wave->type=_RIFFOSER_WAVE_DATA;
+	wave->amplitude=amplitude;
+	wave->pitch=50;
+	
+	io=malloc(sizeof(struct riffoser_io_struct));
+	memset(io,0,sizeof(struct riffoser_io_struct));
+	io->filename=filename;
+	riffoser_ogg_loadfromfile(io);
+
+	riffoser_wave_parsesrc(wave,io,length,amplitude);
+	
+	free(io->src);
+	free(io);
+	
+	return wave;
+}
+
 struct riffoser_wave *riffoser_wave_loadfromwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
 	struct riffoser_wave *wave;
 	struct riffoser_io_struct *io;

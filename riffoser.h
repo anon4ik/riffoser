@@ -14,8 +14,8 @@ extern "C" {
 #define RIFFOSER_CHANNEL_MONO 0
 	
 #define RIFFOSER_CHANNELS_STEREO 2
-#define RIFFOSER_CHANNEL_LEFT 1
-#define RIFFOSER_CHANNEL_RIGHT 0
+#define RIFFOSER_CHANNEL_LEFT 0
+#define RIFFOSER_CHANNEL_RIGHT 1
 
 #define RIFFOSER_CHANNEL_AUTO 255
 	
@@ -101,6 +101,7 @@ extern void riffoser_track_addwave(struct riffoser_track * track,struct riffoser
 
 extern struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_percent_t amplitude,riffoser_frequency_t frequency,riffoser_percent_t pitch);
 extern struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
+extern struct riffoser_wave * riffoser_wave_loadfromogg(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
 extern struct riffoser_wave * riffoser_wave_loadfrommp3(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
 extern void riffoser_wave_free(struct riffoser_wave * wave);
 
