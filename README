@@ -84,6 +84,7 @@ WHAT DO WE NEED ATM
 14) maybe web-based output similar to icecast
 15) various utils, like converting WAV formats, etc
 16) pthreads support to utilize multi-code processors better
-17) any other good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
+17) synthesizer functionality. functions for creating various beats, riffs, drums, piano, etc etc etc.
+18) any other good idea you thought of. just enter irc.freenode.net #riffoser and tell us what's on your mind.
 
 
