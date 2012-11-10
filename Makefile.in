@@ -93,6 +93,7 @@ check-listen: tests
 		TESTS="tests/*" ;\
 	fi ;\
 	for file in $$TESTS ; do\
+		file=$${file#*tests/};\
 		if [ -d "tests/"$$file".tmp" ] ; then\
 			for sound in "tests/"$$file.tmp/*.wav ; do\
 				aplay $$sound;\

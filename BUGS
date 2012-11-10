@@ -37,3 +37,13 @@ tests/singlewaves.tmp/SQUARE_v50_hz150_p50_11025hz_32bit.wav
 bug not critical though
 
 
+----------------------------------------------------------------
+2. wav_readwrite_mono
+----------------------------------
+
+(possible) BUG 2.1
+weird clicking in playback, should be a simple wave
+clicking is more significant on lower sample rates (8000,11025)
+stereo test does not have this problem
+
+
