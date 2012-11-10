@@ -7,9 +7,11 @@ extern "C" {
 
 #include <riffoser.h>
 #include <wavefuncs.h>
-	
+
+#define io_src_t riffoser_data_t
+
 	struct riffoser_io_struct {
-		char *src;
+		io_src_t *src;
 		unsigned long srcsize;
 		riffoser_bytespersample_t bytespersample;
 		riffoser_samplerate_t samplerate;

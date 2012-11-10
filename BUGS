@@ -1,0 +1,39 @@
+CURRENT BUGS LIST (sorted by tests)
+=============================
+
+---------------------------------------------------------------
+1. singlewaves
+----------------------------------
+
+BUG 1.1 - seems like magically self-fixed
+seems there is a problem with 11025hz 16/32-bit format
+triangle and sine waves sound broken
+square waves are silent
+// these sound weird and broken
+tests/singlewaves.tmp/SINE_v100_hz150_p10_11025hz_16bit.wav
+tests/singlewaves.tmp/SINE_v100_hz150_p10_11025hz_32bit.wav
+tests/singlewaves.tmp/SINE_v100_hz150_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/SINE_v100_hz150_p50_11025hz_32bit.wav
+tests/singlewaves.tmp/SINE_v100_hz150_p90_11025hz_16bit.wav
+tests/singlewaves.tmp/SINE_v100_hz150_p90_11025hz_32bit.wav
+tests/singlewaves.tmp/SINE_v100_hz250_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/SINE_v100_hz250_p50_11025hz_32bit.wav
+tests/singlewaves.tmp/SINE_v50_hz150_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/SINE_v50_hz150_p50_11025hz_32bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p10_11025hz_16bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p10_11025hz_32bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p50_11025hz_32bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p90_11025hz_16bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz150_p90_11025hz_32bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz250_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/TRIANGLE_v100_hz250_p50_11025hz_32bit.wav
+tests/singlewaves.tmp/TRIANGLE_v50_hz150_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/TRIANGLE_v50_hz150_p50_11025hz_32bit.wav
+// silence
+tests/singlewaves.tmp/SQUARE_v50_hz150_p50_11025hz_16bit.wav
+tests/singlewaves.tmp/SQUARE_v50_hz150_p50_11025hz_32bit.wav
+11025 is the only odd frequency, maybe it has something to do with this bug
+bug not critical though
+
+

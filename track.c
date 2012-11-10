@@ -34,8 +34,8 @@ void riffoser_track_free(struct riffoser_track * track) {
 	}
 #define RIFFOSER_RENDER___FROM(_v) (track->channels*io->samplerate*_v->from)
 #define RIFFOSER_RENDER___TO(_v) (track->channels*io->samplerate*_v->to)
-#define RIFFOSER_RENDER___WSC(_w) ((1*io->samplerate/_w->frequency))
-#define RIFFOSER_RENDER___WPP(_w,_wp) (_wp*100/RIFFOSER_RENDER___WSC(_w))
+#define RIFFOSER_RENDER___WSC(_w) ((io->samplerate/_w->frequency))
+#define RIFFOSER_RENDER___WPP(_w,_wp) (_wp/RIFFOSER_RENDER___WSC(_w))
 void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_struct *io) {
 	unsigned long i1,i2,i3,i4,i5,i6,i7;
 	unsigned char nomorewaves,vcount,c1;
@@ -44,9 +44,9 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 	riffoser_channel_t chan;
 	
 	io->channels=track->channels;
-	io->srcsize=track->channels*io->samplerate*io->bytespersample*track->length;
-	io->src=malloc(io->srcsize);
-	memset(io->src,0,io->srcsize);
+	io->srcsize=ceil(track->channels*io->samplerate*track->length);
+	io->src=malloc(sizeof(io_src_t)*io->srcsize);
+	memset(io->src,0,sizeof(io_src_t)*io->srcsize);
 	
 	i3=track->waves_count;
 	for (i1=0;i1<i3;i1++)
@@ -90,15 +90,15 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 						0&&printf("%lu: rendering wave %lu (%f-%f), samplenum is %f (%f%%)\n",i1,i2,RIFFOSER_RENDER___FROM(track->wavestates[i2]),RIFFOSER_RENDER___TO(track->wavestates[i2]),track->wavestates[i2]->samplenum,RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						RIFFOSER_WAVE_FUNC(track->waves[i2],RIFFOSER_RENDER___WPP(track->waves[i2],track->wavestates[i2]->samplenum));
 						vcount++;
-						fret=fret*track->waves[i2]->amplitude/100/pow(vcount+1,2);
-						if (fret>99)
-							printf("fret>99 %f\n",fret);
-						RIFFOSER_ENSUREBOUNDS(fret,0,99);
+						fret=fret*track->waves[i2]->amplitude;
+						if (fret>=1)
+							printf("fret>=1 %f\n",fret);
+						RIFFOSER_ENSUREBOUNDS(fret,0,1);
 						
-						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/pow(vcount+1,2)*pow(track->waves[i2]->channels,2);
-						if (val>99)
-							printf("val>99 %f\n",val);
-						RIFFOSER_ENSUREBOUNDS(val,0,99);
+						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/*/pow(vcount+1,2)*pow(track->waves[i2]->channels,2)*//2;
+						if (val>=1)
+							printf("val>=1 %f\n",val);
+						RIFFOSER_ENSUREBOUNDS(val,0,1);
 					}
 					else {
 //						printf("wrong channel ( %u / %u )\n",track->wavestates[i2]->channel,chan);
@@ -107,40 +107,17 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 				}
 			}
 		}
-		val*=vcount;
-		RIFFOSER_ENSUREBOUNDS(val,0,99);
-		if (val>100)
-			printf("(2) val>100 %f\n",val);
-		if (io->bytespersample==1) {
-			ival=round(val*2.56);
-			if (ival>255)
-				ival=255;
-			if (i1<io->srcsize)
-				((unsigned char *)io->src)[i1]=(unsigned char)ival;
-		}
-		else if (io->bytespersample==2) {
-			ival=round(val*655.36)-32768;
-			if (ival>32767)
-				ival=32767;
-			if (i1*2<io->srcsize)
-				((short *)io->src)[i1]=(short)ival;
-		}
-		else if (io->bytespersample==4) {
-			ival=round(val*42949672.96)-2147483648;
-			if (ival>2147483647)
-				ival=2147483647;
-			if (i1*4<io->srcsize)
-				((int *)io->src)[i1]=(int)ival;
-		}
+//		val*=vcount;
+		if (val>=1)
+			printf("(2) val>=1 %f\n",val);
+		RIFFOSER_ENSUREBOUNDS(val,0,1);
+		if (i1<io->srcsize)
+			io->src[i1]=(io_src_t)val;
 		//riffoser_writeint(bytespersample,ival);
 		if ((c1==0)) {
 			if ((i3!=track->waves_count)) {
 				0&&printf("%lu: warping to position %lu\n",i1,i5);
-				i4=(i5-i1+chan)*io->bytespersample;
-/*				skipbuf=malloc(i4);
-				memset(skipbuf,0,i4);
-				riffoser_writebuf(i4,skipbuf);
-				free(skipbuf);*/
+				i4=(i5-i1+chan)/**io->bytespersample*/;
 				i1=i5;
 				RIFFOSER_RENDER___INITWAVES;
 				i3=track->waves_count;
@@ -157,10 +134,10 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 			}
 			i1++;
 		}
-//		printf("%u\n",i1);
 	//usleep(100000);
 	}
 	
+//		printf("%u\n",i1);
 }
 
 void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {

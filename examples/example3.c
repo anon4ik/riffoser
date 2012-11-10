@@ -72,7 +72,7 @@ int main(){
 	riffoser_track_addwave(track,main3,0,34,36);
 
 
-	riffoser_track_writewav(track,"example3.wav",44100,16);
+	riffoser_track_writewav(track,"example3.wav",44100,8);
 
 	riffoser_wave_free(bass1);
 

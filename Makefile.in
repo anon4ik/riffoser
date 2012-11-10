@@ -9,7 +9,7 @@ LIBS=@libs@
 DEFS=@defs@
 
 CC=@CC@
-MKDIR=@CC@
+MKDIR=@MKDIR@
 RM=@RM@
 CHMOD=@CHMOD@
 INSTALL=@INSTALL@
@@ -27,7 +27,7 @@ all: libriffoser.so
 libriffoser.so: riffoser.o track.o wave.o instrument.o wav.o mp3.o ogg.o
 	${CC} -shared -o libriffoser.so -fPIC *.o ${LIBS} ${COMPILEEXTRA}
 
-clean: clean-examples
+clean: clean-examples clean-tests
 	${RM} -f *.o *.o.d *.so
 
 distclean: clean
@@ -66,11 +66,45 @@ clean-examples:
 	done
 	${RM} -f {,examples/}*.{wav,ogg}
 
-check: examples
-	@cd examples &&\
-	for file in *.c ; do\
-		printf "Running "$${file%.c}"...";\
-		./$${file%.c} && echo "OK" || echo "FAILED";\
+tests: tests/*.c libriffoser.so Makefile
+	for file in tests/*.c ; do\
+		${CC} $$file -o $${file%.c} -I. -lriffoser -L. -Wl,-rpath -Wl,`pwd` &&\
+		${CHMOD} +x $${file%.c};\
+	done
+
+check: tests
+	@ cd tests &&\
+	if [ -z "$$TESTS" ] ; then\
+		TESTS="*" ;\
+	fi ;\
+	for file in $$TESTS ; do\
+		if [ -f $$file".c" ] ; then\
+			printf "Running test '"$$file"'...";\
+			${MKDIR} -p $$file".tmp" &&\
+			cd $$file".tmp" && (\
+			../$$file && echo "OK" || echo "FAILED"\
+			) &&\
+			cd ..;\
+		fi;\
+	done
+
+check-listen: tests
+	@if [ -z "$$TESTS" ] ; then\
+		TESTS="tests/*" ;\
+	fi ;\
+	for file in $$TESTS ; do\
+		if [ -d "tests/"$$file".tmp" ] ; then\
+			for sound in "tests/"$$file.tmp/*.wav ; do\
+				aplay $$sound;\
+			done;\
+			cd ..;\
+		fi;\
+	done;
+
+clean-tests:
+	for file in tests/*.c ; do\
+		${RM} -f $${file%.c};\
+		${RM} -Rf $${file%.c}.tmp;\
 	done
 
 install: all
