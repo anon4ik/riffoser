@@ -140,13 +140,12 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 //		printf("%u\n",i1);
 }
 
-void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps) {
+void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_kbps_t kbps) {
 	struct riffoser_io_struct *io;
 	io=malloc(sizeof(struct riffoser_io_struct));
 	memset(io,0,sizeof(struct riffoser_io_struct));
 	io->filename=filename;
 	io->samplerate=samplerate;
-	io->bytespersample=bitspersample/8;
 	io->kbps=kbps;
 	io->channels=track->channels;
 	

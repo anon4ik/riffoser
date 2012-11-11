@@ -34,23 +34,10 @@ void riffoser_wave_parsesrc(struct riffoser_wave *wave, struct riffoser_io_struc
 	wave->data=malloc(tmpi);
 	memset(wave->data,0,tmpi);
 	for (tmpi=0;tmpi<io->srcsize;tmpi++) {
-		if (io->src[tmpi]>=1)
-			printf("%f\n",io->src[tmpi]);
+		if (io->src[tmpi]>1)
+			printf("%f > 1\n",io->src[tmpi]);
 		wave->data[tmpi]=io->src[tmpi]*amplitude;
 	}
-
-//	memcpy(wave->data,io->src,tmpi);
-/*	wave->data_count=io->srcsize/io->bytespersample;
-	wave->data=malloc(sizeof(double)*wave->data_count);
-	for (tmpi=0;tmpi<wave->data_count;tmpi++) {
-		if (io->bytespersample==1)
-			wave->data[tmpi]=(riffoser_data_t)(((((unsigned char *)io->src)[tmpi]))*amplitude/256);
-		else if (io->bytespersample==2)
-			wave->data[tmpi]=(riffoser_data_t)(((((short *)io->src)[tmpi])+32768)*amplitude*2/65536);
-		else if (io->bytespersample==4)
-			wave->data[tmpi]=(riffoser_data_t)((riffoser_data_t)((((int *)io->src)[tmpi])+2147483648)*amplitude/4294967296);
-	}
-	*/
 }
 
 struct riffoser_wave *riffoser_wave_loadfrommp3(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
@@ -85,7 +72,7 @@ struct riffoser_wave *riffoser_wave_loadfromogg(char *filename,riffoser_percent_
 	memset(wave,0,sizeof(struct riffoser_wave));
 	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
 	wave->type=_RIFFOSER_WAVE_DATA;
-	wave->amplitude=amplitude;
+	wave->amplitude=amplitude/100;
 	wave->pitch=50;
 	
 	io=malloc(sizeof(struct riffoser_io_struct));

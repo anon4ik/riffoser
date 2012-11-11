@@ -64,7 +64,7 @@ clean-examples:
 	for file in examples/*.c ; do\
 		${RM} -f $${file%.c};\
 	done
-	${RM} -f {,examples/}*.{wav,ogg}
+	${RM} -f {,examples/}*.{wav,ogg}{,_orig}
 
 tests: tests/*.c libriffoser.so Makefile
 	for file in tests/*.c ; do\
@@ -96,7 +96,14 @@ check-listen: tests
 		file=$${file#*tests/};\
 		if [ -d "tests/"$$file".tmp" ] ; then\
 			for sound in "tests/"$$file.tmp/*.wav ; do\
-				aplay $$sound;\
+				if [ -f $$sound ] ; then\
+					aplay $$sound;\
+				fi;\
+			done;\
+			for sound in "tests/"$$file.tmp/*.ogg ; do\
+				if [ -f $$sound ] ; then\
+					ogg123 $$sound;\
+				fi;\
 			done;\
 			cd ..;\
 		fi;\

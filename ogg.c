@@ -5,6 +5,7 @@
 
 // based on http://svn.xiph.org/trunk/vorbis/examples/encoder_example.c
 int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
+#define USE_OGGVORBIS 1
 #ifndef USE_OGGVORBIS
 	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
 	return (EXIT_FAILURE);
@@ -19,11 +20,12 @@ int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
 	vorbis_block     vb;
 	int eos=0,ret;
 	int i, ii;
-	unsigned int bytes=io->srcsize/io->bytespersample/io->channels;
+	unsigned int bytes=io->srcsize/io->channels;
 	
 	fp=fopen(io->filename,"wb");
 	
 	vorbis_info_init(&vi);
+
 
 	ret = ( vorbis_encode_setup_managed(&vi,io->channels,io->samplerate,-1,io->kbps*1000,-1) || vorbis_encode_ctl(&vi,OV_ECTL_RATEMANAGE2_SET,NULL) || vorbis_encode_setup_init(&vi));
 
@@ -31,9 +33,9 @@ int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
 		printf("Error initializing ogg codec!\n");
 		return (EXIT_FAILURE);
 	}
-	
+
 	vorbis_comment_init(&vc);
-	vorbis_comment_add_tag(&vc,"ENCODER","encoder_example.c");
+	vorbis_comment_add_tag(&vc,"ENCODER",RIFFOSER_VERSION);
 	
 	vorbis_analysis_init(&vd,&vi);
 	vorbis_block_init(&vd,&vb);
@@ -64,12 +66,7 @@ int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
 	
 	for (ii=0;ii<io->channels;ii++) {
 		for (i=0;i<bytes;i++) {
-			if (io->bytespersample==1)
-				buffer[ii][i]=(double)((((unsigned char *)io->src)[i*io->channels+ii]))/128;
-			else if (io->bytespersample==2)
-				buffer[ii][i]=(double)((((short *)io->src)[i*io->channels+ii]))/32768;
-			else if (io->bytespersample==4)
-				buffer[ii][i]=(double)((((int *)io->src)[i*io->channels+ii]))/2147483648;
+			buffer[ii][i]=(float)((((io_src_t *)io->src)[i*io->channels+ii])*1.9-1);
 		}
 	}
 	
@@ -128,12 +125,13 @@ int riffoser_ogg_loadfromfile(struct riffoser_io_struct *io) {
 	vorbis_block     vb; /* local working space for packet->PCM decode */	
 	char *buffer;
 	int  bytes;
-	ogg_int16_t convbuffer[4096]; /* take 8k out of the data segment, not the stack */
+	io_src_t convbuffer[4096];
 	int convsize=4096;
-
+	unsigned long len;
 	FILE *fp;
 	fp=fopen(io->filename,"rb");
-	
+	io_src_t val;
+
 	ogg_sync_init(&oy); /* Now we can read pages */
 	while(1){ /* we repeat if the bitstream is chained */
 		int eos=0;
@@ -221,14 +219,13 @@ int riffoser_ogg_loadfromfile(struct riffoser_io_struct *io) {
 		{
 			char **ptr=vc.user_comments;
 			while(*ptr){
-				printf("%s\n",*ptr);
+//				printf("%s\n",*ptr);
 				++ptr;
 			}
 			io->channels=vi.channels;
 			io->samplerate=vi.rate;
-			io->bytespersample=2;
-			printf("\nBitstream is %d channel, %ldHz\n",vi.channels,vi.rate);
-			printf("Encoded by: %s\n\n",vc.vendor);
+//			printf("\nBitstream is %d channel, %ldHz\n",vi.channels,vi.rate);
+//			printf("Encoded by: %s\n\n",vc.vendor);
 		}
 		
 		convsize=4096/vi.channels;
@@ -266,70 +263,35 @@ int riffoser_ogg_loadfromfile(struct riffoser_io_struct *io) {
                 
 							if(vorbis_synthesis(&vb,&op)==0) /* test for success! */
 								vorbis_synthesis_blockin(&vd,&vb);
-                /* 
-                   
-                **pcm is a multichannel float vector.  In stereo, for
-                example, pcm[0] is left, and pcm[1] is right.  samples is
-                the size of each channel.  Convert the float values
-                (-1.<=range<=1.) to whatever PCM format and write it out */
-                
+
 							while((samples=vorbis_synthesis_pcmout(&vd,&pcm))>0){
 								int j;
 								int clipflag=0;
 								int bout=(samples<convsize?samples:convsize);
                   
-								int min=0;
-								int max=0;
+//								int min=0;
+//								int max=0;
 								for (i=0;i<bout;i++) {
 									for (j=0;j<vi.channels;j++) {
-//										printf("%i\n",(unsigned char)floor(((float *)pcm[j])[i]*128.f+0.5f));
-										int val=floor(((float *)pcm[j])[i]*32767+0.5)*8;
-										if (val>max)
-											max=val;
-										if (val<min)
-											min=val;
-										((short *)convbuffer)[i*vi.channels+j]=val;
+										val=(io_src_t)(((float *)pcm[j])[i])/1.9+0.5; // magic
+										convbuffer[i*vi.channels+j]=val;
 									}
 								}
-								printf("min=%i max=%i\n",min,max);
-/*								
-  								for(i=0;i<vi.channels;i++){
-									ogg_int16_t *ptr=convbuffer+i;
-									float *mono=pcm[i];
-									for(j=0;j<bout;j++){
-#if 1
-										int val=floor(mono[j]*32767.f+.5f);
-//										double val=(mono[j]+1)*500;
-#else 
-										int val=mono[j]*32767.f+drand48()-0.5f;
-#endif
-  										if(val>32767){
-											clipflag=val;
-											val=32767;
-										}
-										if(val<-32768){
-											clipflag=val;
-											val=-32768;
-										}
-										val+=32768;
-										*ptr=val;
-										ptr+=vi.channels;
-//										printf("%i\n",val);
-									}
-								}
-								if(clipflag)
-									printf("Warning: Clipping in frame %ld (%d)\n",(long)(vd.sequence),clipflag);
-*/
+								len=vi.channels*bout;
 								if (io->srcsize==0)
-									io->src=malloc(2*vi.channels*bout);
-								else io->src=realloc(io->src,io->srcsize+2*vi.channels*bout);
-								memcpy(io->src+io->srcsize,convbuffer,2*vi.channels*bout);
-								io->srcsize+=2*vi.channels*bout;
+									io->src=malloc(sizeof(io_src_t)*len);
+								else io->src=realloc(io->src,sizeof(io_src_t)*(io->srcsize+len));
+//								printf("sizeof(io_src_t)=%u io->srcsize=%u len=%u copyoffs=%u bytestocopy=%u io->src=%u copyto=%u\n",sizeof(io_src_t),io->srcsize,len,sizeof(io_src_t)*io->srcsize,sizeof(io_src_t)*len,io->src,io->src+io->srcsize);
+								memcpy(io->src+io->srcsize,&convbuffer,sizeof(io_src_t)*len);
+								io->srcsize+=len;
+								for (i=0;i<io->srcsize;i++)
+									if (io->src[i]>1) {
+										printf("%f >=1 \n",io->src[i]);
+										exit(1);
+									}
 //								fwrite(convbuffer,2*vi.channels,bout,stdout);
-								vorbis_synthesis_read(&vd,bout); /* tell libvorbis how
-                                                      many samples we
-                                                      actually consumed */
-							}            
+								vorbis_synthesis_read(&vd,bout);
+							}
 						}
 					}
 					if(ogg_page_eos(&og))eos=1;
@@ -357,7 +319,7 @@ int riffoser_ogg_loadfromfile(struct riffoser_io_struct *io) {
   
 	fclose(fp);
 	
-	printf("Done (%lu bytes read).\n",io->srcsize);
+//	printf("Done (%lu bytes read).\n",io->srcsize);
 	return(EXIT_SUCCESS);
 	
 #endif

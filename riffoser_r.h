@@ -19,7 +19,7 @@ extern "C" {
 		riffoser_channel_t channels;
 		riffoser_kbps_t kbps;
 	};
-	
+
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
 		v=min;\

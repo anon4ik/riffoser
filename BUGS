@@ -38,12 +38,24 @@ bug not critical though
 
 
 ----------------------------------------------------------------
-2. wav_readwrite_mono
+2. wav_readwrite
 ----------------------------------
 
 (possible) BUG 2.1
-weird clicking in playback, should be a simple wave
+weird clicking in playback (only in MONO), should be a simple wave
 clicking is more significant on lower sample rates (8000,11025)
 stereo test does not have this problem
 
+----------------------------------------------------------------
+3. ogg_readwrite
+----------------------------------
+
+(related to 2.1) BUG 3.1
+strange corruption similar to BUG 2.1 but existing mostly in STEREO mode
+most noticeable in:
+tests/ogg_readwrite.tmp/stereo_OGG_44100_128kbps.ogg
+tests/ogg_readwrite.tmp/stereo_OGG_48000_96kbps.ogg
+
+BUG 3.2
+volume is a bit lower after reconverting .oggs, probably need normalizer stuff
 
