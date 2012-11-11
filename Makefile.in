@@ -105,7 +105,6 @@ check-listen: tests
 					ogg123 $$sound;\
 				fi;\
 			done;\
-			cd ..;\
 		fi;\
 	done;
 
