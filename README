@@ -35,8 +35,8 @@ run "make uninstall" (with root privileges) to uninstall compiled source from sy
   Available tests:
 	singlewaves - will create single wave and save it to various WAV formats (MONO, 8000/11025/22050/44100/48000/96000/192000 samplerate, 8/16/32-bit quality)
 	stereowaves - will generate various stereo waves and save it to various WAV formats
-	wav_readwrite_mono - test will check WAV format reads/writes. it will generate a wave, save it to *.wav_orig file, then read this file and save it to final *.wav. will try all formats (MONO)
-	wav_readwrite_stereo - same with stereo mode
+	wav_readwrite - test will check WAV format reads/writes. it will generate a wave, save it to *.wav_orig file, then read this file and save it to final *.wav. will try all formats
+	ogg_readwrite - same with OGG format
 *** note that "make check" does not guarantee that everything is working properly even if there's no failures. the best way to make sure of it is using "make check-listen" and checking if sounds are really generated correctly.
 
 
