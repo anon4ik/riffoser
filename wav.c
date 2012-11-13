@@ -1,5 +1,64 @@
 #include <riffoser_r.h>
 
+int riffoser_wav_write_start(struct riffoser_io_struct *io) {
+	unsigned long len,i,fpi;
+	
+	io->fp=fopen(io->filename,"wb");
+
+	len=ceil((double)(io->tracklength*io->channels*io->samplerate*io->bytespersample));
+	i=4+24+8+len+(len%2>0?1:0);
+	riffoser_writestr(io->fp,"RIFF");
+	riffoser_writeint(io->fp,4,i);
+	riffoser_writestr(io->fp,"WAVEfmt ");
+	riffoser_writeint(io->fp,4,16);
+	riffoser_writeint(io->fp,2,1);
+	riffoser_writeint(io->fp,2,io->channels);
+	riffoser_writeint(io->fp,4,io->samplerate);
+	riffoser_writeint(io->fp,4,io->bytespersample*io->channels*io->samplerate);
+	riffoser_writeint(io->fp,2,io->bytespersample*io->channels);
+	riffoser_writeint(io->fp,2,io->bytespersample*8);
+	riffoser_writestr(io->fp,"data");
+	riffoser_writeint(io->fp,4,len);
+	if (len%2>0)
+		riffoser_writeint(io->fp,1,0);
+	
+}
+
+int riffoser_wav_write_bytes(struct riffoser_io_struct *io) {
+	char *buf;
+	unsigned int i;
+	signed long v,pow256,len;
+	
+	len=io->srcsize*io->bytespersample;
+	buf=malloc(len);
+
+	pow256=pow(256,io->bytespersample);
+	for (i=0;i<io->srcsize;i++) {
+		v=round((((io_src_t *)io->src)[i])*pow256-(io->bytespersample>1?pow256/2:1));
+		if (v>=pow256)
+			printf("%li >= %lu\n",v,pow256);
+		else if (io->src[i]>=1)
+			printf("%f >= 1\n",io->src[i]);
+		else if (io->src[i]<0)
+			printf("%f < 0\n",io->src[i]);
+		else if (io->bytespersample==1)
+			((unsigned char *)buf)[i]=v;
+		else if (io->bytespersample==2)
+			((unsigned short *)buf)[i]=v;
+		else if (io->bytespersample==4)
+			((int *)buf)[i]=v;
+	}
+	riffoser_writebuf(io->fp,len,buf);
+
+	free(buf);
+
+}
+
+int riffoser_wav_write_end(struct riffoser_io_struct *io) {
+	fclose(io->fp);
+}
+
+/*
 int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	FILE *fp;
 	unsigned long i,fpi;
@@ -32,7 +91,6 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	buf=malloc(len);
 
 	pow256=pow(256,io->bytespersample);
-//	printf("POW=%lu\n",pow256);
 	for (i=0;i<io->srcsize;i++) {
 		v=round((((io_src_t *)io->src)[i])*pow256-(io->bytespersample>1?pow256/2:1));
 		if (v>=pow256)
@@ -47,7 +105,6 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 			((unsigned short *)buf)[i]=v;
 		else if (io->bytespersample==4)
 			((int *)buf)[i]=v;
-//		printf("%u %lu\n",io->bytespersample,v);
 	}
 	riffoser_writebuf(len,buf);
 
@@ -152,3 +209,4 @@ int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 	return (EXIT_SUCCESS);
 }
 
+*/

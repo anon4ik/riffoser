@@ -11,6 +11,8 @@ extern "C" {
 #define io_src_t riffoser_data_t
 
 	struct riffoser_io_struct {
+		FILE *fp;
+		riffoser_tracklen_t tracklength;
 		io_src_t *src;
 		unsigned long srcsize;
 		riffoser_bytespersample_t bytespersample;
@@ -20,6 +22,12 @@ extern "C" {
 		riffoser_kbps_t kbps;
 	};
 
+	struct riffoser_io_funcs {
+		int (*start)(struct riffoser_io_struct io);
+		int (*bytes)(struct riffoser_io_struct io);
+		int (*end)(struct riffoser_io_struct io);
+	};
+	
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
 		v=min;\
@@ -37,14 +45,14 @@ extern "C" {
 #define riffoser_readbuf(buf,size) {\
 	fread(buf,size,1,fp);\
 }
-#define riffoser_writestr(value) {\
+#define riffoser_writestr(fp,value) {\
 	fprintf(fp,value);\
 }
-#define riffoser_writeint(padding,value) {\
+#define riffoser_writeint(fp,padding,value) {\
 	fpi=value;\
 	fwrite((const void *)&fpi,padding,1,fp);\
 }
-#define riffoser_writebuf(size,buf) {\
+#define riffoser_writebuf(fp,size,buf) {\
 	fwrite(buf,size,1,fp);\
 }
 

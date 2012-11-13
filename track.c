@@ -36,7 +36,7 @@ void riffoser_track_free(struct riffoser_track * track) {
 #define RIFFOSER_RENDER___TO(_v) (track->channels*io->samplerate*_v->to)
 #define RIFFOSER_RENDER___WSC(_w) ((io->samplerate/_w->frequency))
 #define RIFFOSER_RENDER___WPP(_w,_wp) (_wp/RIFFOSER_RENDER___WSC(_w))
-void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_struct *io) {
+void riffoser_track_write(struct riffoser_track *track, struct riffoser_io_struct *io,int (*write)(riffoser_io_struct),unsigned long chunksize) {
 	unsigned long i1,i2,i3,i4,i5,i6,i7;
 	unsigned char nomorewaves,vcount,c1;
 	double fret,val;
@@ -173,19 +173,31 @@ void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffo
 	free(io);
 }
 
+extern int riffoser_wav_write_bytes(struct riffoser_io_struct *io);
+
 void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample) {
 	struct riffoser_io_struct *io;
+	struct riffoser_io_funcs *funcs;
 	io=malloc(sizeof(struct riffoser_io_struct));
 	memset(io,0,sizeof(struct riffoser_io_struct));
 	io->filename=filename;
 	io->samplerate=samplerate;
 	io->bytespersample=bitspersample/8;
 	
-	riffoser_track_preparesrc(track,io);
-	riffoser_wav_savetofile(io);
+	funcs=malloc(sizeof(struct riffoser_io_funcs));
 	
-	free(io->src);
+//	funcs->start=riffoser_wav_write_start;
+//	funcs->bytes=riffoser_wav_write_bytes;
+//	funcs->end=riffoser_wav_write_end;
+	
+	riffoser_wav_write_start(io);
+	riffoser_track_write(track,io,riffoser_wav_write_bytes);
+	riffoser_wav_write_end(io);
+//	riffoser_wav_savetofile(io);
+	
 	free(io);
+	
+	free(funcs);
 }
 
 void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave * wave,riffoser_channel_t channel,riffoser_trackpos_t from,riffoser_trackpos_t to) {
