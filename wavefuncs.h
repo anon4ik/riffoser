@@ -17,7 +17,7 @@ extern "C" {
 	else if (_wave->type==RIFFOSER_WAVE_TEST1)\
 		fret=30*(cos(M_PI*(x+1))-sin(2*M_PI*x/1))/*x<_wave->pitch?tan(x)*1:tan(1-(x-_wave->pitch)*2)*1*/;\
 	else if (_wave->type==_RIFFOSER_WAVE_DATA){\
-		i7=(unsigned long)floor((double)x*(double)((double)_wave->data_count))+(chan<track->channels?chan:0);\
+		i7=(unsigned long)round((double)x*(double)((double)_wave->data_count))+(chan<track->channels?chan:0);\
 		if (i7>=_wave->data_count)\
 			i7=_wave->data_count-1;\
 		fret=_wave->data[i7];\

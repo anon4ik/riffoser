@@ -92,10 +92,11 @@ void riffoser_track_preparesrc(struct riffoser_track *track, struct riffoser_io_
 						vcount++;
 						fret=fret*track->waves[i2]->amplitude;
 						if (fret>=1)
-							printf("fret>=1 %f\n",fret);
+							printf("range (0.00-1.00) overflow detected! (%f at position %f sec)\n",fret,(double)(i1/io->samplerate/io->channels));
 						RIFFOSER_ENSUREBOUNDS(fret,0,1);
 						
-						val=sqrt(pow(val,2) + pow(fret,2) + 2 * val * fret)/*/pow(vcount+1,2)*pow(track->waves[i2]->channels,2)*//2;
+//						val=fret;
+						val=sqrt(pow(val,1) + pow(fret,2) + 2 * val * fret)/*/pow(vcount+1,2)*pow(track->waves[i2]->channels,2)*//2;
 						if (val>=1)
 							printf("val>=1 %f\n",val);
 						RIFFOSER_ENSUREBOUNDS(val,0,1);

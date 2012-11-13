@@ -94,7 +94,7 @@ struct riffoser_wave *riffoser_wave_loadfromwav(char *filename,riffoser_percent_
 	
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
-	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
+	RIFFOSER_ENSUREBOUNDS(amplitude,0,199);
 	wave->type=_RIFFOSER_WAVE_DATA;
 	wave->amplitude=amplitude/100;
 	wave->pitch=50;

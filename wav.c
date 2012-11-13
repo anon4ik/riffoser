@@ -2,10 +2,10 @@
 
 int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	FILE *fp;
-	unsigned long i,pow256,fpi;
+	unsigned long i,fpi;
 	unsigned long len;
 
-	long v;
+	signed long v,pow256;
 
 	char *buf;
 
@@ -34,9 +34,9 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	pow256=pow(256,io->bytespersample);
 //	printf("POW=%lu\n",pow256);
 	for (i=0;i<io->srcsize;i++) {
-		v=floor(((io_src_t *)io->src)[i]*pow256/*-(io->bytespersample>1?pow256/2:1)*/);
+		v=round((((io_src_t *)io->src)[i])*pow256-(io->bytespersample>1?pow256/2:1));
 		if (v>=pow256)
-			printf("%lu >= %lu\n",v,pow256);
+			printf("%li >= %lu\n",v,pow256);
 		else if (io->src[i]>=1)
 			printf("%f >= 1\n",io->src[i]);
 		else if (io->src[i]<0)
@@ -44,7 +44,7 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 		else if (io->bytespersample==1)
 			((unsigned char *)buf)[i]=v;
 		else if (io->bytespersample==2)
-			((short *)buf)[i]=v;
+			((unsigned short *)buf)[i]=v;
 		else if (io->bytespersample==4)
 			((int *)buf)[i]=v;
 //		printf("%u %lu\n",io->bytespersample,v);
@@ -119,17 +119,21 @@ int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 						io->src=malloc(sizeof(io_src_t)*io->srcsize);
 						memset(io->src,0,sizeof(io_src_t)*io->srcsize);
 
-						pow256=pow(256,io->bytespersample)/2;
+						pow256=pow(256,io->bytespersample);
 
 						for (tmpl=0;tmpl<io->srcsize;tmpl++) {
 							if (io->bytespersample==1)
-								io->src[tmpl]=((io_src_t)((char *)buffer)[tmpl]/pow256);
+								io->src[tmpl]=((io_src_t)((char *)buffer)[tmpl]/pow256+0.5f);
 							else if (io->bytespersample==2)
-								io->src[tmpl]=((io_src_t)((short *)buffer)[tmpl]/pow256);
+								io->src[tmpl]=((io_src_t)((short *)buffer)[tmpl]/pow256+0.5f);
 							else if (io->bytespersample==4)
-								io->src[tmpl]=((io_src_t)((int *)buffer)[tmpl]/pow256);
+								io->src[tmpl]=((io_src_t)((int *)buffer)[tmpl]/pow256+0.5f);
+							if (io->src[tmpl]<0) {
+								printf("%f < 0\n",io->src[tmpl]);
+								exit(1);
+							}
 							if (io->src[tmpl]>=1) {
-								printf("%u %f\n",io->bytespersample,io->src[tmpl]);
+								printf("%f >= 1\n",io->src[tmpl]);
 								exit(1);
 							}
 						}
