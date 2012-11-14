@@ -1,11 +1,13 @@
 #include <riffoser_r.h>
 
 int riffoser_wav_write_start(struct riffoser_io_struct *io) {
+//	printf("start\n");
 	unsigned long len,i,fpi;
 	
 	io->fp=fopen(io->filename,"wb");
 
 	len=ceil((double)(io->tracklength*io->channels*io->samplerate*io->bytespersample));
+
 	i=4+24+8+len+(len%2>0?1:0);
 	riffoser_writestr(io->fp,"RIFF");
 	riffoser_writeint(io->fp,4,i);
@@ -25,6 +27,7 @@ int riffoser_wav_write_start(struct riffoser_io_struct *io) {
 }
 
 int riffoser_wav_write_bytes(struct riffoser_io_struct *io) {
+//	printf("bytes\n");
 	char *buf;
 	unsigned int i;
 	signed long v,pow256,len;
@@ -51,10 +54,10 @@ int riffoser_wav_write_bytes(struct riffoser_io_struct *io) {
 	riffoser_writebuf(io->fp,len,buf);
 
 	free(buf);
-
 }
 
 int riffoser_wav_write_end(struct riffoser_io_struct *io) {
+//	printf("end\n");
 	fclose(io->fp);
 }
 
@@ -117,7 +120,7 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	
 	return (EXIT_SUCCESS);
 }
-
+*/
 int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 	FILE * fp;
 	char * tmps;
@@ -209,4 +212,3 @@ int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 	return (EXIT_SUCCESS);
 }
 
-*/

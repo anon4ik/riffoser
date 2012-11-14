@@ -22,12 +22,6 @@ extern "C" {
 		riffoser_kbps_t kbps;
 	};
 
-	struct riffoser_io_funcs {
-		int (*start)(struct riffoser_io_struct io);
-		int (*bytes)(struct riffoser_io_struct io);
-		int (*end)(struct riffoser_io_struct io);
-	};
-	
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
 		v=min;\
