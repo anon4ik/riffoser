@@ -8,20 +8,6 @@ extern "C" {
 #include <riffoser.h>
 #include <wavefuncs.h>
 
-#define io_src_t riffoser_data_t
-
-	struct riffoser_io_struct {
-		FILE *fp;
-		riffoser_tracklen_t tracklength;
-		io_src_t *src;
-		unsigned long srcsize;
-		riffoser_bytespersample_t bytespersample;
-		riffoser_samplerate_t samplerate;
-		char *filename;
-		riffoser_channel_t channels;
-		riffoser_kbps_t kbps;
-	};
-
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
 		v=min;\
@@ -29,14 +15,14 @@ extern "C" {
 		v=max;\
 } 
 
-#define riffoser_readstr(arg,size) {\
+#define riffoser_readstr(fp,arg,size) {\
 	fread(arg,size,1,fp);\
 	arg[size]='\0';\
 }
-#define riffoser_readint(arg,padding) {\
+#define riffoser_readint(fp,arg,padding) {\
 	fread(&arg,padding,1,fp);\
 }
-#define riffoser_readbuf(buf,size) {\
+#define riffoser_readbuf(fp,buf,size) {\
 	fread(buf,size,1,fp);\
 }
 #define riffoser_writestr(fp,value) {\

@@ -121,7 +121,77 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 	return (EXIT_SUCCESS);
 }
 */
-int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
+
+int riffoser_wav_read_start(struct riffoser_io_struct *io) {
+	printf("start %s\n",io->filename);
+	char * tmps;
+	unsigned int tmpi;	
+	unsigned short tmpw;
+	
+	if ((io->fp=fopen(io->filename,"rb"))==NULL) {
+		printf("failed to open file %s for reading!\n",io->filename);
+		return (EXIT_FAILURE);
+	}
+	
+	tmps=malloc(5);
+	riffoser_readstr(io->fp,tmps,4);
+	
+	if (!strcmp(tmps,"RIFF")) { // its RIFF
+
+		
+		riffoser_readint(io->fp,tmpi,4);
+		
+		free(tmps);
+		tmps=malloc(9);
+		riffoser_readstr(io->fp,tmps,8);
+		
+		if (!strcmp(tmps,"WAVEfmt ")) { // its WAV
+		
+			riffoser_readint(io->fp,tmpi,4);
+			
+			if (tmpi==16) { // its PCM
+			
+				riffoser_readint(io->fp,tmpw,2);
+				
+				if (tmpw==1) { // there's no compression
+				
+					riffoser_readint(io->fp,io->channels,2);
+					
+					riffoser_readint(io->fp,io->samplerate,4);
+					
+					riffoser_readint(io->fp,tmpi,4);
+					riffoser_readint(io->fp,tmpw,2);
+					
+					riffoser_readint(io->fp,tmpw,2);
+					io->bytespersample=tmpw/8;
+					
+					free(tmps);
+					tmps=malloc(5);
+					riffoser_readstr(io->fp,tmps,4);
+					
+					if (!strcmp(tmps,"data")) { // header was read correctly
+						riffoser_readint(io->fp,tmpi,4);
+						
+						io->tracklength=(riffoser_tracklen_t)((riffoser_tracklen_t)tmpi/io->bytespersample/io->channels/io->samplerate);
+						
+						return (EXIT_SUCCESS);
+					}
+				}
+			}
+		}
+	}
+}
+
+int riffoser_wav_read_bytes(struct riffoser_io_struct *io) {
+	printf("bytes\n");
+}
+
+int riffoser_wav_read_end(struct riffoser_io_struct *io) {
+	printf("end\n");
+	
+}
+
+/*int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 	FILE * fp;
 	char * tmps;
 	unsigned int dlen,tmpi;
@@ -211,4 +281,4 @@ int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
 
 	return (EXIT_SUCCESS);
 }
-
+*/

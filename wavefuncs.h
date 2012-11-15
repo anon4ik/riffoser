@@ -24,6 +24,9 @@ extern "C" {
 		if (fret>=1)\
 			printf("==%f\n",fret);\
 	}\
+	else if (_wave->type==_RIFFOSER_WAVE_IO) {\
+		fret=0;\
+	}\
 }
 
 #ifdef	__cplusplus

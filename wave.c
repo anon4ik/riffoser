@@ -20,6 +20,9 @@ void riffoser_wave_free(struct riffoser_wave * wave) {
 	if (wave->data!=NULL) {
 		free(wave->data);
 	}
+	if (wave->filename!=NULL) {
+		free(wave->filename);
+	}
 	free(wave);
 }
 
@@ -88,7 +91,33 @@ struct riffoser_wave *riffoser_wave_loadfromogg(char *filename,riffoser_percent_
 	return wave;
 }
 
+extern int riffoser_wav_read_start(struct riffoser_io_struct *io);
+extern int riffoser_wav_read_bytes(struct riffoser_io_struct *io);
+extern int riffoser_wav_read_end(struct riffoser_io_struct *io);
+
+struct riffoser_wave *riffoser_wave_readwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
+	struct riffoser_wave *wave;
+	
+	wave=malloc(sizeof(struct riffoser_wave));
+	memset(wave,0,sizeof(struct riffoser_wave));
+	
+	RIFFOSER_ENSUREBOUNDS(amplitude,0,199);
+	wave->type=_RIFFOSER_WAVE_IO;
+	wave->amplitude=amplitude/100;
+	wave->pitch=50;
+	wave->filename=strdup(filename);
+	wave->readfuncs.start=riffoser_wav_read_start;
+	wave->readfuncs.bytes=riffoser_wav_read_bytes;
+	wave->readfuncs.end=riffoser_wav_read_end;
+	
+	return wave;
+}
+
 struct riffoser_wave *riffoser_wave_loadfromwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
+	
+	printf("riffoser_wave_loadfromwav is deprecated, use riffoser_wave_readwav instead.\n");
+	exit(EXIT_FAILURE);
+	
 	struct riffoser_wave *wave;
 	struct riffoser_io_struct *io;
 	
@@ -102,7 +131,7 @@ struct riffoser_wave *riffoser_wave_loadfromwav(char *filename,riffoser_percent_
 	io=malloc(sizeof(struct riffoser_io_struct));
 	memset(io,0,sizeof(struct riffoser_io_struct));
 	io->filename=filename;
-	riffoser_wav_loadfromfile(io);
+//	riffoser_wav_loadfromfile(io);
 
 	riffoser_wave_parsesrc(wave,io,length,amplitude);
 	

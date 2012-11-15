@@ -11,8 +11,11 @@ struct riffoser_track * riffoser_track_init(riffoser_channel_t channels) {
 void riffoser_track_free(struct riffoser_track * track) {
 	unsigned long i;
 	if (track->waves_count>0) {
-		for (i=0;i<track->waves_count;i++)
+		for (i=0;i<track->waves_count;i++) {
+			if (track->wavestates[i]->io!=NULL)
+				free(track->wavestates[i]->io);
 			free(track->wavestates[i]);
+		}
 		free(track->wavestates);
 		free(track->waves);
 	}
@@ -36,7 +39,7 @@ void riffoser_track_free(struct riffoser_track * track) {
 #define RIFFOSER_RENDER___TO(_v) (track->channels*io->samplerate*_v->to)
 #define RIFFOSER_RENDER___WSC(_w) ((io->samplerate/_w->frequency))
 #define RIFFOSER_RENDER___WPP(_w,_wp) (_wp/RIFFOSER_RENDER___WSC(_w))
-void riffoser_track_write(struct riffoser_track *track, struct riffoser_io_struct *io,int (*io_write_func)(riffoser_io_struct),unsigned long chunksize) {
+void riffoser_track_write(struct riffoser_track *track, struct riffoser_io_struct *io,int (*io_write_func)(struct riffoser_io_struct *io),unsigned long chunksize) {
 	unsigned long i1,i2,i3,i4,i5,i6,i7,i8,i9;
 	unsigned char nomorewaves,vcount,c1;
 	double fret,val;
@@ -218,6 +221,13 @@ void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave *
 	track->wavestates[track->waves_count]->from=from;
 	track->wavestates[track->waves_count]->to=to;
 	track->wavestates[track->waves_count]->channel=channel;
+	if (wave->type==_RIFFOSER_WAVE_IO) {
+		track->wavestates[track->waves_count]->io=malloc(sizeof(struct riffoser_io_struct));
+		memset(track->wavestates[track->waves_count]->io,0,sizeof(struct riffoser_io_struct));
+		track->wavestates[track->waves_count]->io->filename=track->waves[track->waves_count]->filename;
+		track->waves[track->waves_count]->readfuncs.start(track->wavestates[track->waves_count]->io);
+//		printf("bps=%u channels=%u kbps=%u samplerate=%u tracklen=%f\n",track->wavestates[track->waves_count]->io->bytespersample,track->wavestates[track->waves_count]->io->channels,track->wavestates[track->waves_count]->io->kbps,track->wavestates[track->waves_count]->io->samplerate,track->wavestates[track->waves_count]->io->tracklength);
+	}
 	
 	track->waves_count++;
 	
