@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define RIFFOSER_WAVE_FUNC(_wave,x) {\
+#define RIFFOSER_WAVE_FUNC(_wave,_wavestate,x) {\
 	if (_wave->type==RIFFOSER_WAVE_SQUARE)\
 		fret=x<_wave->pitch?0:1;\
 	else if (_wave->type==RIFFOSER_WAVE_TRIANGLE)\
@@ -23,6 +23,56 @@ extern "C" {
 		fret=_wave->data[i7];\
 		if (fret>=1)\
 			printf("==%f\n",fret);\
+	}\
+	else if (_wave->type==_RIFFOSER_WAVE_IO) {\
+		i7=(unsigned long)round((double)x*(double)((double)_wavestate->io->datalen))+(chan<track->channels?chan:0);\
+		if (i7>=_wavestate->io->datalen)\
+			i7=_wavestate->io->datalen-1;\
+		if (i7<_wavestate->bufoffset) {\
+			i9=floor(i7/chunksize_read);\
+			_wave->readfuncs.end(_wavestate->io);\
+			_wave->readfuncs.start(_wavestate->io);\
+			free(_wavestate->io->src);\
+			_wavestate->bufoffset=i9*chunksize_read;\
+			if (i9>0) {\
+				_wave->readfuncs.skip(_wavestate->io,_wavestate->bufoffset);\
+ /*				_wavestate->io->srcsize=_wavestate->bufoffset;\
+				_wavestate->io->src=malloc(sizeof(io_src_t)*_wavestate->io->srcsize);\
+				memset(_wavestate->io->src,0,sizeof(io_src_t)*_wavestate->io->srcsize);\
+				_wave->readfuncs.bytes(_wavestate->io);\
+				free(_wavestate->io->src);*/\
+			}\
+			_wavestate->io->srcsize=chunksize_read;\
+			0&&printf("rrr i9=%lu i7=%lu bufoffset=%lu toread=%lu\n",i9,i7,_wavestate->bufoffset,_wavestate->io->srcsize);\
+			_wavestate->io->src=malloc(sizeof(io_src_t)*_wavestate->io->srcsize);\
+			memset(_wavestate->io->src,0,sizeof(io_src_t)*_wavestate->io->srcsize);\
+			_wave->readfuncs.bytes(_wavestate->io);\
+			fret=_wavestate->io->src[i7];\
+		}\
+		else if (i7<_wavestate->bufoffset+chunksize_read) {\
+			fret=_wavestate->io->src[i7-_wavestate->bufoffset];\
+			0&&printf("zzz pos=%lu i7=%lu bufoffset=%lu fret=%f\n",i7-_wavestate->bufoffset,i7,_wavestate->bufoffset,fret);\
+		}\
+		else {\
+			i9=floor((i7)/chunksize_read);\
+			free(_wavestate->io->src);\
+			if (i9*chunksize_read-_wavestate->bufoffset-chunksize_read>0) {\
+				_wave->readfuncs.skip(_wavestate->io,i9*chunksize_read-_wavestate->bufoffset-chunksize_read);\
+ /*				_wavestate->io->srcsize=i9*chunksize_read-_wavestate->bufoffset-chunksize_read;\
+				0&&printf("fff i9=%lu i7=%lu bufoffset=%lu toskip=%lu\n",i9,i7,_wavestate->bufoffset,_wavestate->io->srcsize);\
+				_wavestate->io->src=malloc(sizeof(io_src_t)*_wavestate->io->srcsize);\
+				memset(_wavestate->io->src,0,sizeof(io_src_t)*_wavestate->io->srcsize);\
+				_wave->readfuncs.bytes(_wavestate->io);\
+				free(_wavestate->io->src);*/\
+			}\
+			_wavestate->bufoffset=i9*chunksize_read;\
+			_wavestate->io->srcsize=chunksize_read;\
+			_wavestate->io->src=malloc(sizeof(io_src_t)*_wavestate->io->srcsize);\
+			memset(_wavestate->io->src,0,sizeof(io_src_t)*_wavestate->io->srcsize);\
+			_wave->readfuncs.bytes(_wavestate->io);\
+			fret=_wavestate->io->src[i7-_wavestate->bufoffset];\
+			0&&printf("fff pos=%lu i9=%lu i7=%lu bufoffset=%lu toread=%lu fret=%f\n",i7-_wavestate->bufoffset,i9,i7,_wavestate->bufoffset,_wavestate->io->srcsize,fret);\
+		}\
 	}\
 }
 

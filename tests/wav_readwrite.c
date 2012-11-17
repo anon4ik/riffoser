@@ -19,8 +19,8 @@ int main() {
 	riffoser_wave_free(right);\
 	riffoser_track_free(track);\
 	track=riffoser_track_init(RIFFOSER_CHANNELS_STEREO);\
-	left=riffoser_wave_loadfromwav("stereo_"filename".wav_orig",100,100);\
-	right=riffoser_wave_loadfromwav("stereo_"filename".wav_orig",100,100);\
+	left=riffoser_wave_readwav("stereo_"filename".wav_orig",100,100);\
+	right=riffoser_wave_readwav("stereo_"filename".wav_orig",100,100);\
 	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_LEFT,0,6);\
 	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_RIGHT,0,6);\
 	riffoser_track_writewav(track,"stereo_"filename".wav",hz,bitrate);\
@@ -38,7 +38,7 @@ int main() {
 	riffoser_wave_free(left);\
 	riffoser_track_free(track);\
 	track=riffoser_track_init(RIFFOSER_CHANNELS_MONO);\
-	left=riffoser_wave_loadfromwav("mono_"filename".wav_orig",100,100);\
+	left=riffoser_wave_readwav("mono_"filename".wav_orig",100,100);\
 	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_MONO,0,4);\
 	riffoser_track_writewav(track,"mono_"filename".wav",hz,bitrate);\
 	riffoser_wave_free(left);\

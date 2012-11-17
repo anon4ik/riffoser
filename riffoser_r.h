@@ -8,17 +8,12 @@ extern "C" {
 #include <riffoser.h>
 #include <wavefuncs.h>
 
-#define io_src_t riffoser_data_t
-
-	struct riffoser_io_struct {
-		io_src_t *src;
-		unsigned long srcsize;
-		riffoser_bytespersample_t bytespersample;
-		riffoser_samplerate_t samplerate;
-		char *filename;
-		riffoser_channel_t channels;
-		riffoser_kbps_t kbps;
-	};
+#define CHUNKSIZE_WAV_READ 123
+#define CHUNKSIZE_WAV_WRITE 65536
+#define CHUNKSIZE_MP3_READ 1024
+#define CHUNKSIZE_MP3_WRITE 1024
+#define CHUNKSIZE_OGG_READ 1024
+#define CHUNKSIZE_OGG_WRITE 1024
 
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\
@@ -27,25 +22,25 @@ extern "C" {
 		v=max;\
 } 
 
-#define riffoser_readstr(arg,size) {\
+#define riffoser_readstr(fp,arg,size) {\
 	fread(arg,size,1,fp);\
 	arg[size]='\0';\
 }
-#define riffoser_readint(arg,padding) {\
+#define riffoser_readint(fp,arg,padding) {\
 	fread(&arg,padding,1,fp);\
 }
-#define riffoser_readbuf(buf,size) {\
+#define riffoser_readbuf(fp,buf,size) {\
 	fread(buf,size,1,fp);\
 }
-#define riffoser_writestr(value) {\
+#define riffoser_writestr(fp,value) {\
 	fprintf(fp,value);\
 }
-#define riffoser_writeint(padding,value) {\
+#define riffoser_writeint(fp,padding,value) {\
 	fpi=value;\
 	fwrite((const void *)&fpi,padding,1,fp);\
 }
-#define riffoser_writebuf(size,buf) {\
-	fwrite(buf,size,1,fp);\
+#define riffoser_writebuf(fp,size,count,buf) {\
+	fwrite(buf,size,count,fp);\
 }
 
 #ifdef	__cplusplus
