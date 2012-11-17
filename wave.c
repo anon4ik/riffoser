@@ -104,6 +104,7 @@ struct riffoser_wave *riffoser_wave_readwav(char *filename,riffoser_percent_t am
 	RIFFOSER_ENSUREBOUNDS(amplitude,0,199);
 	wave->type=_RIFFOSER_WAVE_IO;
 	wave->amplitude=amplitude/100;
+	wave->lengthscale=length/100;
 	wave->pitch=50;
 	wave->filename=strdup(filename);
 	wave->readfuncs.start=riffoser_wav_read_start;

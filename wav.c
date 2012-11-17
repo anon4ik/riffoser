@@ -6,9 +6,7 @@ int riffoser_wav_write_start(struct riffoser_io_struct *io) {
 	
 	io->fp=fopen(io->filename,"wb");
 
-	len=ceil((double)(io->tracklength*io->channels*io->samplerate*io->bytespersample));
-
-	i=4+24+8+len+(len%2>0?1:0);
+	i=4+24+8+io->datalen+(io->datalen%2>0?1:0);
 	riffoser_writestr(io->fp,"RIFF");
 	riffoser_writeint(io->fp,4,i);
 	riffoser_writestr(io->fp,"WAVEfmt ");
@@ -20,8 +18,8 @@ int riffoser_wav_write_start(struct riffoser_io_struct *io) {
 	riffoser_writeint(io->fp,2,io->bytespersample*io->channels);
 	riffoser_writeint(io->fp,2,io->bytespersample*8);
 	riffoser_writestr(io->fp,"data");
-	riffoser_writeint(io->fp,4,len);
-	if (len%2>0)
+	riffoser_writeint(io->fp,4,io->datalen);
+	if (io->datalen%2>0)
 		riffoser_writeint(io->fp,1,0);
 	
 }
@@ -123,7 +121,7 @@ int riffoser_wav_savetofile(struct riffoser_io_struct *io) {
 */
 
 int riffoser_wav_read_start(struct riffoser_io_struct *io) {
-	printf("start %s\n",io->filename);
+	0&&printf("start %s\n",io->filename);
 	char * tmps;
 	unsigned int tmpi;	
 	unsigned short tmpw;
@@ -170,25 +168,64 @@ int riffoser_wav_read_start(struct riffoser_io_struct *io) {
 					riffoser_readstr(io->fp,tmps,4);
 					
 					if (!strcmp(tmps,"data")) { // header was read correctly
-						riffoser_readint(io->fp,tmpi,4);
+						free(tmps);
+
+						riffoser_readint(io->fp,io->datalen,4);
 						
-						io->tracklength=(riffoser_tracklen_t)((riffoser_tracklen_t)tmpi/io->bytespersample/io->channels/io->samplerate);
 						
+						
+						0&&printf("/start %s\n",io->filename);
 						return (EXIT_SUCCESS);
 					}
 				}
 			}
 		}
 	}
+	free(tmps);
+	return (EXIT_FAILURE);
 }
 
 int riffoser_wav_read_bytes(struct riffoser_io_struct *io) {
-	printf("bytes\n");
+	unsigned long tmpl,pow256,dlen;
+
+	0&&printf("bytes %s\n",io->filename);
+	char *buffer;
+
+	dlen=io->srcsize*io->bytespersample;
+
+	buffer=malloc(dlen);
+	memset(buffer,0,dlen);
+	riffoser_readbuf(io->fp,buffer,io->srcsize);
+
+	pow256=pow(256,io->bytespersample);
+
+	for (tmpl=0;tmpl<io->srcsize;tmpl++) {
+		if (io->bytespersample==1)
+			io->src[tmpl]=((io_src_t)((char *)buffer)[tmpl]/pow256+0.5f);
+		else if (io->bytespersample==2)
+			io->src[tmpl]=((io_src_t)((short *)buffer)[tmpl]/pow256+0.5f);
+		else if (io->bytespersample==4)
+			io->src[tmpl]=((io_src_t)((int *)buffer)[tmpl]/pow256+0.5f);
+		if (io->src[tmpl]<0) {
+			printf("%f < 0\n",io->src[tmpl]);
+			exit(1);
+		}
+		if (io->src[tmpl]>=1) {
+			printf("%f >= 1\n",io->src[tmpl]);
+			exit(1);
+		}
+	}
+
+
+	free(buffer);
+
+	0&&printf("/bytes %s\n",io->filename);
 }
 
 int riffoser_wav_read_end(struct riffoser_io_struct *io) {
-	printf("end\n");
-	
+	0&&printf("end %s\n",io->filename);
+	fclose(io->fp);
+	0&&printf("/end %s\n",io->filename);
 }
 
 /*int riffoser_wav_loadfromfile(struct riffoser_io_struct *io) {
