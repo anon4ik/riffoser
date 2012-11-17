@@ -8,7 +8,7 @@ extern "C" {
 #include <riffoser.h>
 #include <wavefuncs.h>
 
-#define CHUNKSIZE_WAV_READ 102400
+#define CHUNKSIZE_WAV_READ 65536
 #define CHUNKSIZE_WAV_WRITE 65536
 #define CHUNKSIZE_MP3_READ 1024
 #define CHUNKSIZE_MP3_WRITE 1024
@@ -39,8 +39,8 @@ extern "C" {
 	fpi=value;\
 	fwrite((const void *)&fpi,padding,1,fp);\
 }
-#define riffoser_writebuf(fp,size,buf) {\
-	fwrite(buf,size,1,fp);\
+#define riffoser_writebuf(fp,size,count,buf) {\
+	fwrite(buf,size,count,fp);\
 }
 
 #ifdef	__cplusplus

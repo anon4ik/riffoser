@@ -67,7 +67,7 @@ void riffoser_track_free(struct riffoser_track * track) {
 #define RIFFOSER_RENDER___FROM(_v) (track->channels*io->samplerate*_v->from)
 #define RIFFOSER_RENDER___TO(_v) (track->channels*io->samplerate*_v->to)
 #define RIFFOSER_RENDER___WSC(_w) ((io->samplerate/_w->frequency))
-#define RIFFOSER_RENDER___WPP(_w,_wp) (_wp/RIFFOSER_RENDER___WSC(_w))
+#define RIFFOSER_RENDER___WPP(_w,_wp) (_wp/RIFFOSER_RENDER___WSC(_w)/1) // magic?
 void riffoser_track_write(struct riffoser_track *track, struct riffoser_io_struct *io,int (*io_write_func)(struct riffoser_io_struct *io),unsigned long chunksize_read,unsigned long chunksize_write) {
 	unsigned long i1,i2,i3,i4,i5,i6,i7,i8,i9;
 	unsigned char nomorewaves,vcount,c1;
@@ -229,7 +229,7 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 	io->samplerate=samplerate;
 	io->bytespersample=bitspersample/8;
 	io->channels=track->channels;
-	io->datalen=ceil((double)(track->length*io->channels*io->samplerate*io->bytespersample));
+	io->datalen=ceil((double)(track->length*io->channels*io->samplerate));
 
 	riffoser_wav_write_start(io);
 	riffoser_track_write(track,io,riffoser_wav_write_bytes,CHUNKSIZE_WAV_READ,CHUNKSIZE_WAV_WRITE);
@@ -260,10 +260,10 @@ void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave *
 		memset(track->wavestates[track->waves_count]->io,0,sizeof(struct riffoser_io_struct));
 		track->wavestates[track->waves_count]->io->filename=track->waves[track->waves_count]->filename;
 		track->waves[track->waves_count]->readfuncs.start(track->wavestates[track->waves_count]->io);
-		tracklength=(riffoser_tracklen_t)((riffoser_tracklen_t)track->wavestates[track->waves_count]->io->datalen/track->wavestates[track->waves_count]->io->bytespersample/track->wavestates[track->waves_count]->io->channels/track->wavestates[track->waves_count]->io->samplerate);
+		tracklength=(riffoser_tracklen_t)((riffoser_tracklen_t)track->wavestates[track->waves_count]->io->datalen/track->wavestates[track->waves_count]->io->channels/track->wavestates[track->waves_count]->io->samplerate);
 //		track->waves[track->waves_count]->frequency=tracklength/(riffoser_frequency_t)(riffoser_frequency_t)track->waves[track->waves_count]->channels/(riffoser_frequency_t)track->wavestates[track->waves_count]->io->samplerate);
 		track->waves[track->waves_count]->frequency=track->waves[track->waves_count]->lengthscale/tracklength;
-		printf("bps=%u channels=%u kbps=%u samplerate=%u tracklen=%f datalen=%lu frequency=%f\n",track->wavestates[track->waves_count]->io->bytespersample,track->wavestates[track->waves_count]->io->channels,track->wavestates[track->waves_count]->io->kbps,track->wavestates[track->waves_count]->io->samplerate,tracklength,track->wavestates[track->waves_count]->io->datalen,track->waves[track->waves_count]->frequency);
+//		printf("bps=%u channels=%u kbps=%u samplerate=%u tracklen=%f datalen=%lu frequency=%f\n",track->wavestates[track->waves_count]->io->bytespersample,track->wavestates[track->waves_count]->io->channels,track->wavestates[track->waves_count]->io->kbps,track->wavestates[track->waves_count]->io->samplerate,tracklength,track->wavestates[track->waves_count]->io->datalen,track->waves[track->waves_count]->frequency);
 	}
 	
 	track->waves_count++;
