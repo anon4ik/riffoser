@@ -1,10 +1,7 @@
 /*
 
-	example for importing and combining mono wave files
-	it loads /usr/share/sounds/alsa/Front_Left.wav and plays it looped with 70% of speed on left channel
-	it loads /usr/share/sounds/alsa/Front_Right.wav and plays it looped with 140% of speed on right channel
-	it loads /usr/share/sounds/alsa/Noise.wav and plays it looped with 50% of volume, 150% of speed on both channels
-	finally it saves them to 16-bit 48000Hz 128kbps MP3 "example6.mp3"
+	create left and right samples, save im .ogg files
+	then read them and combine in final 48000hz ~160kbps .ogg file
 
 */
 
@@ -12,32 +9,37 @@
 
 #include <riffoser.h>
 
-int main(){
-	struct riffoser_track * track;
+int main() {
 
-	struct riffoser_wave *frontleft, *frontright, *noise;
+	struct riffoser_track *track;
+	struct riffoser_wave *wave1,*wave2;
 
-	track=riffoser_track_init(2);
+	// create left channel (triangle wave @120hz)
+	track=riffoser_track_init(RIFFOSER_CHANNELS_STEREO);
+	wave1=riffoser_wave_init(RIFFOSER_WAVE_TRIANGLE,100,120,50);
+	riffoser_track_addwave(track,wave1,RIFFOSER_CHANNEL_LEFT,0,3);
+	riffoser_track_writeogg(track,"example6l.ogg",48000,128);
+	riffoser_track_writewav(track,"example6l.wav",48000,16);
+	riffoser_wave_free(wave1);
+	riffoser_track_free(track);
 
-	frontleft=riffoser_wave_loadfromwav("/usr/share/sounds/alsa/Front_Left.wav",100,70);
-	frontright=riffoser_wave_loadfromwav("/usr/share/sounds/alsa/Front_Right.wav",100,140);
-	noise=riffoser_wave_loadfromwav("/usr/share/sounds/alsa/Noise.wav",50,150);
+	// create right channel (sine wave @260hz)
+	track=riffoser_track_init(RIFFOSER_CHANNELS_STEREO);
+	wave1=riffoser_wave_init(RIFFOSER_WAVE_SINE,100,260,50);
+	riffoser_track_addwave(track,wave1,RIFFOSER_CHANNEL_RIGHT,0,3);
+	riffoser_track_writeogg(track,"example6r.ogg",48000,128);
+	riffoser_wave_free(wave1);
+	riffoser_track_free(track);
 
-	riffoser_track_addwave(track,frontleft,1,0,10);
-
-	riffoser_track_addwave(track,frontright,0,0,10);
-
-	riffoser_track_addwave(track,noise,0,0,10);
-	riffoser_track_addwave(track,noise,1,0,10);
-
-	riffoser_track_writemp3(track,"example6.mp3",48000,16,128);
-
-	riffoser_wave_free(frontleft);
-	riffoser_wave_free(frontright);
-	riffoser_wave_free(noise);
-
-        riffoser_track_free(track);
-
-	exit(EXIT_SUCCESS);
+	// now read them from .ogg files and combine into stereo track, then save to wav and ogg
+	track=riffoser_track_init(RIFFOSER_CHANNELS_STEREO);
+	wave1=riffoser_wave_readogg("example6l.ogg",100,100);
+	wave2=riffoser_wave_readogg("example6r.ogg",100,100);
+	riffoser_track_addwave(track,wave1,RIFFOSER_CHANNEL_LEFT,0,3);
+	riffoser_track_addwave(track,wave2,RIFFOSER_CHANNEL_RIGHT,0,3);
+	riffoser_track_writeogg(track,"example6.ogg",48000,160);
+	riffoser_wave_free(wave1);
+	riffoser_wave_free(wave2);
+	riffoser_track_free(track);
 
 }

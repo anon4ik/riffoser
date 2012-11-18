@@ -10,10 +10,10 @@ int main() {
 	track=riffoser_track_init(RIFFOSER_CHANNELS_STEREO);\
 	left=riffoser_wave_init(RIFFOSER_WAVE_SINE,100,150,50);\
 	right=riffoser_wave_init(RIFFOSER_WAVE_SINE,100,250,50);\
-	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_LEFT,0,2);\
-	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_RIGHT,2,4);\
-	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_LEFT,4,6);\
-	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_RIGHT,4,6);\
+	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_LEFT,0,1.5);\
+	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_RIGHT,2,3.5);\
+	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_LEFT,4,5.5);\
+	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_RIGHT,4,5.5);\
 	riffoser_track_writewav(track,"stereo_"filename".wav_orig",hz,bitrate);\
 	riffoser_wave_free(left);\
 	riffoser_wave_free(right);\
@@ -33,7 +33,10 @@ int main() {
 #define testwav_mono(filename,hz,bitrate)\
 	track=riffoser_track_init(RIFFOSER_CHANNELS_MONO);\
 	left=riffoser_wave_init(RIFFOSER_WAVE_SINE,100,150,50);\
-	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_MONO,0,4);\
+	right=riffoser_wave_init(RIFFOSER_WAVE_SINE,0,150,50);\
+	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_MONO,0,1);\
+	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_MONO,2,3);\
+	riffoser_track_addwave(track,right,RIFFOSER_CHANNEL_MONO,3,4);\
 	riffoser_track_writewav(track,"mono_"filename".wav_orig",hz,bitrate);\
 	riffoser_wave_free(left);\
 	riffoser_track_free(track);\
@@ -42,6 +45,7 @@ int main() {
 	riffoser_track_addwave(track,left,RIFFOSER_CHANNEL_MONO,0,4);\
 	riffoser_track_writewav(track,"mono_"filename".wav",hz,bitrate);\
 	riffoser_wave_free(left);\
+	riffoser_wave_free(right);\
 	riffoser_track_free(track);\
 	fprintf(stdout,".");\
 	fflush(stdout);

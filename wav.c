@@ -175,6 +175,7 @@ int riffoser_wav_read_reset(struct riffoser_io_struct *io) {
 	riffoser_wav_read_start(io);
 }
 
-int riffoser_wav_read_skip(struct riffoser_io_struct *io,unsigned long bytes) {
-	fseek(io->fp,bytes,SEEK_CUR);
+int riffoser_wav_read_skip(struct riffoser_io_struct *io,unsigned long samples) {
+	printf("skip %lu\n",samples);
+	fseek(io->fp,samples*io->bytespersample,SEEK_CUR);
 }

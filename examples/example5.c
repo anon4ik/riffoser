@@ -4,7 +4,7 @@
 	it loads /usr/share/sounds/alsa/Front_Left.wav and plays it looped with 70% of speed on left channel
 	it loads /usr/share/sounds/alsa/Front_Right.wav and plays it looped with 140% of speed on right channel
 	it loads /usr/share/sounds/alsa/Noise.wav and plays it looped with 50% of volume, 150% of speed on both channels
-	finally it saves them to 16-bit 48000Hz WAV PCM example5.wav
+	finally it saves them to 128kbps 48000Hz OGG example5.ogg
 
 */
 

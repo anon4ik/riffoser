@@ -43,50 +43,54 @@ void riffoser_wave_parsesrc(struct riffoser_wave *wave, struct riffoser_io_struc
 	}
 }
 
-struct riffoser_wave *riffoser_wave_loadfrommp3(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
+extern int riffoser_ogg_read_start(struct riffoser_io_struct *io);
+extern int riffoser_ogg_read_bytes(struct riffoser_io_struct *io);
+extern int riffoser_ogg_read_end(struct riffoser_io_struct *io);
+extern int riffoser_ogg_read_skip(struct riffoser_io_struct *io,unsigned long bytes);
+extern int riffoser_ogg_read_reset(struct riffoser_io_struct *io);
+
+struct riffoser_wave *riffoser_wave_readogg(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
 	struct riffoser_wave *wave;
-	struct riffoser_io_struct *io;
 	
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
-	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
-	wave->type=_RIFFOSER_WAVE_DATA;
+	
+	wave->type=_RIFFOSER_WAVE_IO;
 	wave->amplitude=amplitude/100;
+	wave->lengthscale=length/100;
 	wave->pitch=50;
-	
-	io=malloc(sizeof(struct riffoser_io_struct));
-	memset(io,0,sizeof(struct riffoser_io_struct));
-	io->filename=filename;
-	riffoser_mp3_loadfromfile(io);
-
-	riffoser_wave_parsesrc(wave,io,length,amplitude);
-	
-	free(io->src);
-	free(io);
+	wave->filename=strdup(filename);
+	wave->readfuncs.start=riffoser_ogg_read_start;
+	wave->readfuncs.bytes=riffoser_ogg_read_bytes;
+	wave->readfuncs.end=riffoser_ogg_read_end;
+	wave->readfuncs.skip=riffoser_ogg_read_skip;
+	wave->readfuncs.reset=riffoser_ogg_read_reset;
 	
 	return wave;
 }
 
-struct riffoser_wave *riffoser_wave_loadfromogg(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
+extern int riffoser_mp3_read_start(struct riffoser_io_struct *io);
+extern int riffoser_mp3_read_bytes(struct riffoser_io_struct *io);
+extern int riffoser_mp3_read_end(struct riffoser_io_struct *io);
+extern int riffoser_mp3_read_skip(struct riffoser_io_struct *io,unsigned long bytes);
+extern int riffoser_mp3_read_reset(struct riffoser_io_struct *io);
+
+struct riffoser_wave *riffoser_wave_readmp3(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
 	struct riffoser_wave *wave;
-	struct riffoser_io_struct *io;
-	
+
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
-	RIFFOSER_ENSUREBOUNDS(amplitude,0,99);
-	wave->type=_RIFFOSER_WAVE_DATA;
-	wave->amplitude=amplitude/100;
-	wave->pitch=50;
-	
-	io=malloc(sizeof(struct riffoser_io_struct));
-	memset(io,0,sizeof(struct riffoser_io_struct));
-	io->filename=filename;
-	riffoser_ogg_loadfromfile(io);
 
-	riffoser_wave_parsesrc(wave,io,length,amplitude);
-	
-	free(io->src);
-	free(io);
+	wave->type=_RIFFOSER_WAVE_IO;
+	wave->amplitude=amplitude/100;
+	wave->lengthscale=length/100;
+	wave->pitch=50;
+	wave->filename=strdup(filename);
+	wave->readfuncs.start=riffoser_mp3_read_start;
+	wave->readfuncs.bytes=riffoser_mp3_read_bytes;
+	wave->readfuncs.end=riffoser_mp3_read_end;
+	wave->readfuncs.skip=riffoser_mp3_read_skip;
+	wave->readfuncs.reset=riffoser_mp3_read_reset;
 	
 	return wave;
 }
@@ -103,7 +107,6 @@ struct riffoser_wave *riffoser_wave_readwav(char *filename,riffoser_percent_t am
 	wave=malloc(sizeof(struct riffoser_wave));
 	memset(wave,0,sizeof(struct riffoser_wave));
 	
-	RIFFOSER_ENSUREBOUNDS(amplitude,0,199);
 	wave->type=_RIFFOSER_WAVE_IO;
 	wave->amplitude=amplitude/100;
 	wave->lengthscale=length/100;
@@ -117,32 +120,3 @@ struct riffoser_wave *riffoser_wave_readwav(char *filename,riffoser_percent_t am
 	
 	return wave;
 }
-
-struct riffoser_wave *riffoser_wave_loadfromwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length) {
-	
-	printf("riffoser_wave_loadfromwav is deprecated, use riffoser_wave_readwav instead.\n");
-	exit(EXIT_FAILURE);
-	
-	struct riffoser_wave *wave;
-	struct riffoser_io_struct *io;
-	
-	wave=malloc(sizeof(struct riffoser_wave));
-	memset(wave,0,sizeof(struct riffoser_wave));
-	RIFFOSER_ENSUREBOUNDS(amplitude,0,199);
-	wave->type=_RIFFOSER_WAVE_DATA;
-	wave->amplitude=amplitude/100;
-	wave->pitch=50;
-	
-	io=malloc(sizeof(struct riffoser_io_struct));
-	memset(io,0,sizeof(struct riffoser_io_struct));
-	io->filename=filename;
-//	riffoser_wav_loadfromfile(io);
-
-	riffoser_wave_parsesrc(wave,io,length,amplitude);
-	
-	free(io->src);
-	free(io);
-	
-	return wave;
-}
-

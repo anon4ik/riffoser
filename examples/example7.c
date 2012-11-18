@@ -4,6 +4,8 @@
         this generates 1-minute-length stereo track with random waves
         parameters are easily tweakable via defines
 
+	actually this is just OGG and MP3 version of example4
+
 */
 
 #include <stdio.h>
@@ -50,6 +52,7 @@ int main(){
 
 
 	riffoser_track_writeogg(track,"example7.ogg",44100,160);
+	riffoser_track_writemp3(track,"example7.mp3",44100,160);
 
 	for (i=0;i<WAVES_COUNT;i++)
 		riffoser_wave_free(waves[i]);

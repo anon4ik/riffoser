@@ -20,7 +20,7 @@
 #define MINPITCH 10
 #define MAXPITCH 90
 #define MINVOLUME 30
-#define MAXVOLUME 99
+#define MAXVOLUME 100
 
 int main(){
 	struct riffoser_track * track;
@@ -37,8 +37,8 @@ int main(){
 	waves=malloc(sizeof(struct riffoser_wave *)*WAVES_COUNT);
 
 	for (i=0;i<WAVES_COUNT;i++) {
-		c1=rand()%4;
-		c2=(c1==0?RIFFOSER_WAVE_SINE:(c1==1?RIFFOSER_WAVE_TRIANGLE:(c1==2?RIFFOSER_WAVE_SQUARE:RIFFOSER_WAVE_COSINUSOID)));
+		c1=rand()%3;
+		c2=(c1==0?RIFFOSER_WAVE_SINE:(c1==1?RIFFOSER_WAVE_TRIANGLE:RIFFOSER_WAVE_SQUARE));
 		waves[i]=riffoser_wave_init(c2,rand()%(MAXVOLUME-MINVOLUME+1)+MINVOLUME,rand()%(MAXFREQUENCY-MINFREQUENCY+1)+MINFREQUENCY,rand()%(MAXPITCH-MINPITCH+1)+MINPITCH);
 	}
 

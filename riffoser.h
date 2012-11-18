@@ -6,12 +6,6 @@
 #include <string.h>
 #include <math.h>
 
-#ifdef USE_OGGVORBIS
-#include <ogg/ogg.h>
-#include <vorbis/codec.h>
-#include <vorbis/vorbisenc.h>
-#endif
-
 #ifdef	__cplusplus
 extern "C" {
 #endif
@@ -72,15 +66,7 @@ struct riffoser_io_struct {
 	char *filename;
 	riffoser_channel_t channels;
 	riffoser_kbps_t kbps;
-#ifdef USE_OGGVORBIS
-	vorbis_info vi;
-	vorbis_comment vc;
-	vorbis_dsp_state vd;
-	vorbis_block vb;
-	ogg_packet op;
-	ogg_page og;
-	ogg_stream_state os;
-#endif
+	void *extra;
 };
 
 struct riffoser_wave {
@@ -102,7 +88,7 @@ struct riffoser_wave {
 		int (*bytes)(struct riffoser_io_struct *io);
 		int (*end)(struct riffoser_io_struct *io);
 		int (*reset)(struct riffoser_io_struct *io);
-		int (*skip)(struct riffoser_io_struct *io,unsigned long bytes);
+		int (*skip)(struct riffoser_io_struct *io,unsigned long samples);
 	} readfuncs;
 	riffoser_percent_t lengthscale;
 };
@@ -120,15 +106,14 @@ struct riffoser_wave {
 extern struct riffoser_track * riffoser_track_init(riffoser_channel_t channels);
 extern void riffoser_track_free(struct riffoser_track * track);
 extern void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample);
-extern void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_bitspersample_t bitspersample,riffoser_kbps_t kbps);
+extern void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_kbps_t kbps);
 extern void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_kbps_t kbps);
 extern void riffoser_track_addwave(struct riffoser_track * track,struct riffoser_wave * wave,riffoser_channel_t channel,riffoser_trackpos_t from,riffoser_trackpos_t to);
 
-extern struct riffoser_wave * riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_percent_t amplitude,riffoser_frequency_t frequency,riffoser_percent_t pitch);
-extern struct riffoser_wave * riffoser_wave_readwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length);
-extern struct riffoser_wave * riffoser_wave_loadfromwav(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
-extern struct riffoser_wave * riffoser_wave_loadfromogg(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
-extern struct riffoser_wave * riffoser_wave_loadfrommp3(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
+extern struct riffoser_wave *riffoser_wave_init(riffoser_wavetype_t wavetype,riffoser_percent_t amplitude,riffoser_frequency_t frequency,riffoser_percent_t pitch);
+extern struct riffoser_wave *riffoser_wave_readwav(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length);
+extern struct riffoser_wave *riffoser_wave_readogg(char *filename,riffoser_percent_t amplitude,riffoser_percent_t length);
+extern struct riffoser_wave *riffoser_wave_readmp3(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
 extern void riffoser_wave_free(struct riffoser_wave * wave);
 
 extern struct riffoser_instrument * riffoser_instrument_init();
