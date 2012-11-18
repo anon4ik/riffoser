@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <debugstuff.h>
 
 #ifdef USE_OGGVORBIS
 #include <ogg/ogg.h>
