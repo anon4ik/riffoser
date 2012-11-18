@@ -105,6 +105,11 @@ check-listen: tests
 					ogg123 $$sound;\
 				fi;\
 			done;\
+			for sound in "tests/"$$file.tmp/*.mp3 ; do\
+				if [ -f $$sound ] ; then\
+					mpg123 $$sound;\
+				fi;\
+			done;\
 		fi;\
 	done;
 
