@@ -1,11 +1,128 @@
 #include <riffoser_r.h>
-#include <ogg/ogg.h>
-#include <vorbis/codec.h>
-#include <vorbis/vorbisenc.h>
+
+int riffoser_ogg_write_start(struct riffoser_io_struct *io) {
+#ifndef USE_OGGVORBIS
+	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
+	return (EXIT_FAILURE);
+#else
+	ogg_page og;
+	int eos=0,ret;
+
+//	printf("start\n");
+
+	io->fp=fopen(io->filename,"wb");
+
+	vorbis_info_init(&io->vi);
+
+	ret = ( vorbis_encode_setup_managed(&io->vi,io->channels,io->samplerate,-1,io->kbps*1000,-1) || vorbis_encode_ctl(&io->vi,OV_ECTL_RATEMANAGE2_SET,NULL) || vorbis_encode_setup_init(&io->vi));
+
+	if(ret) {
+		printf("Error initializing ogg codec!\n");
+		return (EXIT_FAILURE);
+	}
+
+	vorbis_comment_init(&io->vc);
+	vorbis_comment_add_tag(&io->vc,"ENCODER",RIFFOSER_VERSION);
+
+	vorbis_analysis_init(&io->vd,&io->vi);
+	vorbis_block_init(&io->vd,&io->vb);
+
+	srand(time(NULL));
+	ogg_stream_init(&io->os,rand());
+
+	{
+		ogg_packet header;
+		ogg_packet header_comm;
+		ogg_packet header_code;
+
+		vorbis_analysis_headerout(&io->vd,&io->vc,&header,&header_comm,&header_code);
+		ogg_stream_packetin(&io->os,&header); /* automatically placed in its own page */
+		ogg_stream_packetin(&io->os,&header_comm);
+		ogg_stream_packetin(&io->os,&header_code);
+
+		while(!eos){
+			int result=ogg_stream_flush(&io->os,&og);
+			if(result==0)break;
+			fwrite(og.header,1,og.header_len,io->fp);
+			fwrite(og.body,1,og.body_len,io->fp);
+		}
+
+	}
+
+	return (EXIT_SUCCESS);
+#endif
+}
+
+int riffoser_ogg_write_bytes(struct riffoser_io_struct *io) {
+#ifndef USE_OGGVORBIS
+	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
+	return (EXIT_FAILURE);
+#else
+	int i, ii;
+	unsigned int bytes=io->srcsize/io->channels;
+	float **buffer;
+	int eos=0;
+
+//	printf("bytes %lu\n",io->srcsize);
+
+	buffer=vorbis_analysis_buffer(&io->vd,bytes);
+
+	for (ii=0;ii<io->channels;ii++) {
+		for (i=0;i<bytes;i++) {
+			buffer[io->channels-1-ii][i]=(float)((((io_src_t *)io->src)[i*io->channels+ii]*2-1));
+			//printf("%f\n",buffer[ii][i]);
+		}
+	}
+
+	vorbis_analysis_wrote(&io->vd,i);
+
+	while(vorbis_analysis_blockout(&io->vd,&io->vb)==1){
+
+		vorbis_analysis(&io->vb,NULL);
+		vorbis_bitrate_addblock(&io->vb);
+
+		while(vorbis_bitrate_flushpacket(&io->vd,&io->op)){
+
+			ogg_stream_packetin(&io->os,&io->op);
+
+			while(!eos){
+				int result=ogg_stream_pageout(&io->os,&io->og);
+				if(result==0)
+					break;
+				fwrite(io->og.header,1,io->og.header_len,io->fp);
+				fwrite(io->og.body,1,io->og.body_len,io->fp);
+
+				if(ogg_page_eos(&io->og))eos=1;
+			}
+		}
+	}
+
+	vorbis_analysis_wrote(&io->vd,0);
+
+	return (EXIT_SUCCESS);
+#endif
+}
+
+int riffoser_ogg_write_end(struct riffoser_io_struct *io) {
+#ifndef USE_OGGVORBIS
+	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
+	return (EXIT_FAILURE);
+#else
+//	printf("end\n");
+
+	ogg_stream_clear(&io->os);
+	vorbis_block_clear(&io->vb);
+	vorbis_dsp_clear(&io->vd);
+	vorbis_comment_clear(&io->vc);
+	vorbis_info_clear(&io->vi);
+	fclose(io->fp);
+
+	return (EXIT_SUCCESS);
+#endif
+}
 
 // based on http://svn.xiph.org/trunk/vorbis/examples/encoder_example.c
 int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
-#define USE_OGGVORBIS 1
 #ifndef USE_OGGVORBIS
 	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
 	return (EXIT_FAILURE);
@@ -22,84 +139,8 @@ int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
 	int i, ii;
 	unsigned int bytes=io->srcsize/io->channels;
 	
-	fp=fopen(io->filename,"wb");
 	
-	vorbis_info_init(&vi);
 
-
-	ret = ( vorbis_encode_setup_managed(&vi,io->channels,io->samplerate,-1,io->kbps*1000,-1) || vorbis_encode_ctl(&vi,OV_ECTL_RATEMANAGE2_SET,NULL) || vorbis_encode_setup_init(&vi));
-
-	if(ret) {
-		printf("Error initializing ogg codec!\n");
-		return (EXIT_FAILURE);
-	}
-
-	vorbis_comment_init(&vc);
-	vorbis_comment_add_tag(&vc,"ENCODER",RIFFOSER_VERSION);
-	
-	vorbis_analysis_init(&vd,&vi);
-	vorbis_block_init(&vd,&vb);
-	
-	srand(time(NULL));
-	ogg_stream_init(&os,rand());
-	
-	{
-		ogg_packet header;
-		ogg_packet header_comm;
-		ogg_packet header_code;
-
-		vorbis_analysis_headerout(&vd,&vc,&header,&header_comm,&header_code);
-		ogg_stream_packetin(&os,&header); /* automatically placed in its own page */
-		ogg_stream_packetin(&os,&header_comm);
-		ogg_stream_packetin(&os,&header_code);
-
-		while(!eos){
-			int result=ogg_stream_flush(&os,&og);
-			if(result==0)break;
-			fwrite(og.header,1,og.header_len,fp);
-			fwrite(og.body,1,og.body_len,fp);
-		}
-
-	}
-	
-	float **buffer=vorbis_analysis_buffer(&vd,bytes);
-	
-	for (ii=0;ii<io->channels;ii++) {
-		for (i=0;i<bytes;i++) {
-			buffer[ii][i]=(float)((((io_src_t *)io->src)[i*io->channels+ii])*1.9-1);
-		}
-	}
-	
-	vorbis_analysis_wrote(&vd,bytes);
-	
-	while(vorbis_analysis_blockout(&vd,&vb)==1){
-
-		vorbis_analysis(&vb,NULL);
-		vorbis_bitrate_addblock(&vb);
-
-		while(vorbis_bitrate_flushpacket(&vd,&op)){
-
-			ogg_stream_packetin(&os,&op);
-
-			while(!eos){
-				int result=ogg_stream_pageout(&os,&og);
-				if(result==0)
-					break;
-				fwrite(og.header,1,og.header_len,fp);
-				fwrite(og.body,1,og.body_len,fp);
-
-				if(ogg_page_eos(&og))eos=1;
-			}
-		}
-	}
-	
-	vorbis_analysis_wrote(&vd,0);
-
-	ogg_stream_clear(&os);
-	vorbis_block_clear(&vb);
-	vorbis_dsp_clear(&vd);
-	vorbis_comment_clear(&vc);
-	vorbis_info_clear(&vi);
 
 	
 	fclose(fp);

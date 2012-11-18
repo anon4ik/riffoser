@@ -49,7 +49,7 @@ int main(){
 	}
 
 
-	riffoser_track_writeogg(track,"example7.ogg",44100,8,256);
+	riffoser_track_writeogg(track,"example7.ogg",44100,160);
 
 	for (i=0;i<WAVES_COUNT;i++)
 		riffoser_wave_free(waves[i]);

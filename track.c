@@ -187,6 +187,8 @@ void riffoser_track_write(struct riffoser_track *track, struct riffoser_io_struc
 //		printf("%u\n",i1);
 }
 
+extern int riffoser_ogg_write_bytes(struct riffoser_io_struct *io);
+
 void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffoser_samplerate_t samplerate,riffoser_kbps_t kbps) {
 	struct riffoser_io_struct *io;
 	io=malloc(sizeof(struct riffoser_io_struct));
@@ -195,11 +197,14 @@ void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffo
 	io->samplerate=samplerate;
 	io->kbps=kbps;
 	io->channels=track->channels;
+	io->datalen=ceil((double)(track->length*io->channels*io->samplerate));
 	
 	//riffoser_track_preparesrc(track,io);
-	riffoser_ogg_savetofile(io);
+	//riffoser_ogg_savetofile(io);
+	riffoser_ogg_write_start(io);
+	riffoser_track_write(track,io,riffoser_ogg_write_bytes,CHUNKSIZE_OGG_READ,CHUNKSIZE_OGG_WRITE);
+	riffoser_ogg_write_end(io);
 	
-	free(io->src);
 	free(io);
 }
 
@@ -234,7 +239,7 @@ void riffoser_track_writewav(struct riffoser_track * track,char * filename,riffo
 	riffoser_wav_write_start(io);
 	riffoser_track_write(track,io,riffoser_wav_write_bytes,CHUNKSIZE_WAV_READ,CHUNKSIZE_WAV_WRITE);
 	riffoser_wav_write_end(io);
-	
+
 	free(io);
 	
 }

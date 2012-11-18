@@ -30,7 +30,7 @@ int main(){
 	riffoser_track_addwave(track,noise,0,0,10);
 	riffoser_track_addwave(track,noise,1,0,10);
 
-	riffoser_track_writewav(track,"example5.wav",48000,16);
+	riffoser_track_writeogg(track,"example5.ogg",48000,128);
 
 	riffoser_wave_free(frontleft);
 	riffoser_wave_free(frontright);

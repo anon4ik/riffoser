@@ -8,12 +8,12 @@ extern "C" {
 #include <riffoser.h>
 #include <wavefuncs.h>
 
-#define CHUNKSIZE_WAV_READ 123
+#define CHUNKSIZE_WAV_READ 65536
 #define CHUNKSIZE_WAV_WRITE 65536
 #define CHUNKSIZE_MP3_READ 1024
 #define CHUNKSIZE_MP3_WRITE 1024
-#define CHUNKSIZE_OGG_READ 1024
-#define CHUNKSIZE_OGG_WRITE 1024
+#define CHUNKSIZE_OGG_READ 24000
+#define CHUNKSIZE_OGG_WRITE 24000
 
 #define RIFFOSER_ENSUREBOUNDS(v,min,max) {\
 	if (v<min)\

@@ -1,10 +1,18 @@
 #ifndef RIFFOSER_H
 #define	RIFFOSER_H
 
+#define USE_OGGVORBIS 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+
+#ifdef USE_OGGVORBIS
+#include <ogg/ogg.h>
+#include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
+#endif
 
 #ifdef	__cplusplus
 extern "C" {
@@ -66,6 +74,15 @@ struct riffoser_io_struct {
 	char *filename;
 	riffoser_channel_t channels;
 	riffoser_kbps_t kbps;
+#ifdef USE_OGGVORBIS
+	vorbis_info vi;
+	vorbis_comment vc;
+	vorbis_dsp_state vd;
+	vorbis_block vb;
+	ogg_packet op;
+	ogg_page og;
+	ogg_stream_state os;
+#endif
 };
 
 struct riffoser_wave {
