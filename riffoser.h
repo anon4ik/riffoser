@@ -1,8 +1,6 @@
 #ifndef RIFFOSER_H
 #define	RIFFOSER_H
 
-#define USE_OGGVORBIS 1
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
