@@ -149,8 +149,6 @@ int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
 #endif
 }
 
-#define USE_OGGVORBIS 1
-
 int riffoser_ogg_loadfromfile(struct riffoser_io_struct *io) {
 #ifndef USE_OGGVORBIS
 	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
