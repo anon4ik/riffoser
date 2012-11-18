@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-// nothing to see here, move along
+#define USE_OGGVORBIS 1
 
 #ifdef	__cplusplus
 }
