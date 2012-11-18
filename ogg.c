@@ -75,18 +75,8 @@ int riffoser_ogg_write_bytes(struct riffoser_io_struct *io) {
 
 	vorbis_analysis_wrote(&io->vd,bytes);
 
-	return (EXIT_SUCCESS);
-#endif
-}
-
-int riffoser_ogg_write_end(struct riffoser_io_struct *io) {
-#ifndef USE_OGGVORBIS
-	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
-	return (EXIT_FAILURE);
-#else
-//	printf("end\n");
 	int eos=0;
-	
+
 	while(vorbis_analysis_blockout(&io->vd,&io->vb)==1){
 
 		vorbis_analysis(&io->vb,NULL);
@@ -108,6 +98,17 @@ int riffoser_ogg_write_end(struct riffoser_io_struct *io) {
 		}
 	}
 
+	return (EXIT_SUCCESS);
+#endif
+}
+
+int riffoser_ogg_write_end(struct riffoser_io_struct *io) {
+#ifndef USE_OGGVORBIS
+	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
+	return (EXIT_FAILURE);
+#else
+//	printf("end\n");
+
 	vorbis_analysis_wrote(&io->vd,0);
 
 	ogg_stream_clear(&io->os);
@@ -118,34 +119,6 @@ int riffoser_ogg_write_end(struct riffoser_io_struct *io) {
 	vorbis_info_clear(&io->vi);
 	fclose(io->fp);
 
-	return (EXIT_SUCCESS);
-#endif
-}
-
-// based on http://svn.xiph.org/trunk/vorbis/examples/encoder_example.c
-int riffoser_ogg_savetofile(struct riffoser_io_struct *io) {
-#ifndef USE_OGGVORBIS
-	printf("Error: riffoser was compiled without ogg support (recompile with --with-ogg)\n");
-	return (EXIT_FAILURE);
-#else
-	FILE *fp;
-	ogg_stream_state os;
-	ogg_page         og;
-	ogg_packet       op;
-	vorbis_info      vi;
-	vorbis_comment   vc;
-	vorbis_dsp_state vd;
-	vorbis_block     vb;
-	int eos=0,ret;
-	int i, ii;
-	unsigned int bytes=io->srcsize/io->channels;
-	
-	
-
-
-	
-	fclose(fp);
-	
 	return (EXIT_SUCCESS);
 #endif
 }
