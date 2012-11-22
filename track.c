@@ -1,28 +1,5 @@
 #include <riffoser_r.h>
 
-struct riffoser_wavestate {
-	riffoser_channel_t channel;
-	riffoser_trackpos_t from;
-	riffoser_trackpos_t to;
-	riffoser_wavestate_state_t state;
-	double samplenum;
-
-	// for _RIFFOSER_WAVE_IO
-	struct riffoser_io_struct *io;
-	unsigned long bufoffset;
-};
-
-struct riffoser_instrumentstate {
-	riffoser_wavestate_state_t state;
-	riffoser_trackpos_t from;
-	riffoser_trackpos_t to;
-	double samplenum;
-	riffoser_channel_t channel;
-	riffoser_percent_t amplitude;
-	riffoser_frequency_t frequency;
-	riffoser_percent_t pitch;
-};
-
 struct riffoser_track * riffoser_track_init(riffoser_channel_t channels) {
 	struct riffoser_track * track;
 	track=malloc(sizeof(struct riffoser_track));

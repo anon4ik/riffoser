@@ -185,9 +185,7 @@ int riffoser_ogg_read_bytes(struct riffoser_io_struct *io) {
 		long ret=ov_read(&io_ogg_read->vf,(char *)buf,(io->srcsize-ofs)*sizeof(unsigned short),0,sizeof(unsigned short),0,&io_ogg_read->current_section);
 		ret/=sizeof(unsigned short);
 		if (ret+ofs>io->srcsize) {
-			printf("while reading %lu bytes:\n",(io->srcsize-ofs));
 			printf("warning: excess bytes from ov_read\n");
-			printf("read %lu bytes (ofs=%lu) ; %lu < %lu\n",ret,ofs);
 		}
 		if ((ret == 0)||(ret+ofs>io->srcsize)) {
 		      /* EOF */

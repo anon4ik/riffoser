@@ -29,8 +29,15 @@ extern "C" {
 #define RIFFOSER_WAVESTATE_RENDERING 1
 #define RIFFOSER_WAVESTATE_FINISHED 2
 #define riffoser_channel_t unsigned char
-
+#define riffoser_samplerate_t unsigned int
+#define riffoser_bitspersample_t unsigned char
+#define riffoser_bytespersample_t unsigned char
+#define riffoser_kbps_t unsigned short
+#define riffoser_tracklen_t double
+	
 struct riffoser_instrument {
+	riffoser_channel_t channels;
+	riffoser_tracklen_t length;
 	struct riffoser_wave ** waves;
 	struct riffoser_wavestate ** wavestates;
 	unsigned short waves_count;
@@ -39,11 +46,6 @@ struct riffoser_instrument {
 	unsigned short instruments_count;
 };
 
-#define riffoser_samplerate_t unsigned int
-#define riffoser_bitspersample_t unsigned char
-#define riffoser_bytespersample_t unsigned char
-#define riffoser_kbps_t unsigned short
-#define riffoser_tracklen_t double
 struct riffoser_track {
 	riffoser_channel_t channels;
 	struct riffoser_wave ** waves;
@@ -116,8 +118,10 @@ extern struct riffoser_wave *riffoser_wave_readogg(char *filename,riffoser_perce
 extern struct riffoser_wave *riffoser_wave_readmp3(char * filename,riffoser_percent_t amplitude,riffoser_percent_t length);
 extern void riffoser_wave_free(struct riffoser_wave * wave);
 
-extern struct riffoser_instrument * riffoser_instrument_init();
+extern struct riffoser_instrument * riffoser_instrument_init(riffoser_channel_t channels);
 extern void riffoser_instrument_free(struct riffoser_instrument * instrument);
+extern void riffoser_instrument_addwave(struct riffoser_instrument *instrument, struct riffoser_wave *wave, riffoser_channel_t channel, riffoser_tracklen_t from, riffoser_tracklen_t to);
+extern void riffoser_instrument_play(struct riffoser_track *track, struct riffoser_instrument *instrument, riffoser_channel_t channel, riffoser_tracklen_t from, riffoser_tracklen_t to);
 
 #define RIFFOSER_VERSION_BASE "riffoser"
 #define RIFFOSER_VERSION_MAJOR "0"
