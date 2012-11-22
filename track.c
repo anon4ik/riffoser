@@ -209,9 +209,11 @@ void riffoser_track_writeogg(struct riffoser_track * track,char * filename,riffo
 	io->channels=track->channels;
 	io->datalen=ceil((double)(track->length*io->channels*io->samplerate));
 	
-	riffoser_ogg_write_start(io);
-	riffoser_track_write(track,io,riffoser_ogg_write_bytes,CHUNKSIZE_OGG_READ,CHUNKSIZE_OGG_WRITE);
-	riffoser_ogg_write_end(io);
+	if (!riffoser_ogg_write_start(io)) {
+		riffoser_track_write(track,io,riffoser_ogg_write_bytes,CHUNKSIZE_OGG_READ,CHUNKSIZE_OGG_WRITE);
+		riffoser_ogg_write_end(io);
+	}
+	else printf("Error writing ogg\n");
 	
 	free(io);
 }
@@ -228,9 +230,11 @@ void riffoser_track_writemp3(struct riffoser_track * track,char * filename,riffo
 	io->samplerate=samplerate;
 	io->datalen=ceil((double)(track->length*io->channels*io->samplerate));
 
-	riffoser_mp3_write_start(io);
-	riffoser_track_write(track,io,riffoser_mp3_write_bytes,CHUNKSIZE_MP3_READ,CHUNKSIZE_MP3_WRITE);
-	riffoser_mp3_write_end(io);
+	if (!riffoser_mp3_write_start(io)) {
+		riffoser_track_write(track,io,riffoser_mp3_write_bytes,CHUNKSIZE_MP3_READ,CHUNKSIZE_MP3_WRITE);
+		riffoser_mp3_write_end(io);
+	}
+	else printf("Error writing mp3\n");
 
 	free(io);
 }
